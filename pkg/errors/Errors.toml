@@ -42,19 +42,25 @@ SID = "volume-manager"
     Kind = 6
 
 [[error]]
+    Name = "ErrResourceAlreadyExists"
+    StatusHTTP = 400
+    Message = "Resource already exists"
+    Kind = 7
+
+[[error]]
     Name = "ErrQuotaExceeded"
     StatusHTTP = 400
     Message = "Resource quota exceeded"
-    Kind = 7
+    Kind = 8
 
 [[error]]
     Name = "ErrNoFreeStorages"
     StatusHTTP = 507
     Message = "No free storages found for volume"
-    Kind = 8
+    Kind = 9
 
 [[error]]
     Name = "ErrStorageDelete"
     StatusHTTP = 400
     Message = "Can`t delete storage with volumes"
-    Kind = 9
+    Kind = 10

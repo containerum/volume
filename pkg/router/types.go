@@ -4,6 +4,7 @@ import (
 	"net/textproto"
 
 	"git.containerum.net/ch/volume-manager/pkg/errors"
+	"git.containerum.net/ch/volume-manager/static"
 	"github.com/containerum/cherry"
 	"github.com/containerum/utils/httputil"
 	"github.com/gin-gonic/gin"
@@ -77,7 +78,7 @@ type Router struct {
 }
 
 func NewRouter(engine gin.IRouter, tv *TranslateValidate) *Router {
-	//engine.StaticFS("/static", static.HTTP)
+	engine.StaticFS("/static", static.HTTP)
 
 	ret := &Router{
 		engine: engine,

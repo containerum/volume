@@ -158,7 +158,6 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//  - $ref: '#/parameters/UserIDHeader'
 	//  - $ref: '#/parameters/UserRoleHeader'
 	//  - $ref: '#/parameters/SubstitutedUserID'
-	//  - $ref: '#/parameters/ResourceID'
 	//  - $ref: '#/parameters/NamespaceID'
 	// responses:
 	//   '200':
@@ -223,7 +222,6 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//  - $ref: '#/parameters/UserIDHeader'
 	//  - $ref: '#/parameters/UserRoleHeader'
 	//  - $ref: '#/parameters/SubstitutedUserID'
-	//  - $ref: '#/parameters/ResourceID'
 	//  - $ref: '#/parameters/NamespaceID'
 	// responses:
 	//   '200':
@@ -263,7 +261,6 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//    required: true
 	//    schema:
 	//      $ref: '#/definitions/VolumeRenameRequest'
-	//  - $ref: '#/parameters/ResourceID'
 	// responses:
 	//   '200':
 	//     description: volume renamed
@@ -286,7 +283,6 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//    required: true
 	//    schema:
 	//      $ref: '#/definitions/VolumeResizeRequest'
-	//  - $ref: '#/parameters/ResourceID'
 	// responses:
 	//   '200':
 	//     description: volume resized

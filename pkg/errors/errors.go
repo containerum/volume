@@ -12,7 +12,7 @@ const ()
 // ErrAdminRequired error
 // User is not admin and has no permissions
 func ErrAdminRequired(params ...func(*cherry.Err)) *cherry.Err {
-	err := &cherry.Err{Message: "Admin access required", StatusHTTP: 403, ID: cherry.ErrID{SID: "permissions", Kind: 0x1}, Details: []string(nil), Fields: cherry.Fields(nil)}
+	err := &cherry.Err{Message: "Admin access required", StatusHTTP: 403, ID: cherry.ErrID{SID: "volume-manager", Kind: 0x1}, Details: []string(nil), Fields: cherry.Fields(nil)}
 	for _, param := range params {
 		param(err)
 	}
@@ -24,7 +24,7 @@ func ErrAdminRequired(params ...func(*cherry.Err)) *cherry.Err {
 }
 
 func ErrRequiredHeadersNotProvided(params ...func(*cherry.Err)) *cherry.Err {
-	err := &cherry.Err{Message: "Required headers not provided", StatusHTTP: 400, ID: cherry.ErrID{SID: "permissions", Kind: 0x2}, Details: []string(nil), Fields: cherry.Fields(nil)}
+	err := &cherry.Err{Message: "Required headers not provided", StatusHTTP: 400, ID: cherry.ErrID{SID: "volume-manager", Kind: 0x2}, Details: []string(nil), Fields: cherry.Fields(nil)}
 	for _, param := range params {
 		param(err)
 	}
@@ -38,7 +38,7 @@ func ErrRequiredHeadersNotProvided(params ...func(*cherry.Err)) *cherry.Err {
 // ErrRequestValidationFailed error
 // Validation error when parsing request
 func ErrRequestValidationFailed(params ...func(*cherry.Err)) *cherry.Err {
-	err := &cherry.Err{Message: "Request validation failed", StatusHTTP: 400, ID: cherry.ErrID{SID: "permissions", Kind: 0x3}, Details: []string(nil), Fields: cherry.Fields(nil)}
+	err := &cherry.Err{Message: "Request validation failed", StatusHTTP: 400, ID: cherry.ErrID{SID: "volume-manager", Kind: 0x3}, Details: []string(nil), Fields: cherry.Fields(nil)}
 	for _, param := range params {
 		param(err)
 	}
@@ -50,21 +50,7 @@ func ErrRequestValidationFailed(params ...func(*cherry.Err)) *cherry.Err {
 }
 
 func ErrInternal(params ...func(*cherry.Err)) *cherry.Err {
-	err := &cherry.Err{Message: "Internal error", StatusHTTP: 500, ID: cherry.ErrID{SID: "permissions", Kind: 0x4}, Details: []string(nil), Fields: cherry.Fields(nil)}
-	for _, param := range params {
-		param(err)
-	}
-	for i, detail := range err.Details {
-		det := renderTemplate(detail)
-		err.Details[i] = det
-	}
-	return err
-}
-
-// ErrOwnerAlreadyExists error
-// Resource can have only one owner
-func ErrOwnerAlreadyExists(params ...func(*cherry.Err)) *cherry.Err {
-	err := &cherry.Err{Message: "Owner for resource already exists", StatusHTTP: 400, ID: cherry.ErrID{SID: "permissions", Kind: 0x5}, Details: []string(nil), Fields: cherry.Fields(nil)}
+	err := &cherry.Err{Message: "Internal error", StatusHTTP: 500, ID: cherry.ErrID{SID: "volume-manager", Kind: 0x4}, Details: []string(nil), Fields: cherry.Fields(nil)}
 	for _, param := range params {
 		param(err)
 	}
@@ -76,7 +62,7 @@ func ErrOwnerAlreadyExists(params ...func(*cherry.Err)) *cherry.Err {
 }
 
 func ErrDatabase(params ...func(*cherry.Err)) *cherry.Err {
-	err := &cherry.Err{Message: "Database error", StatusHTTP: 500, ID: cherry.ErrID{SID: "permissions", Kind: 0x6}, Details: []string(nil), Fields: cherry.Fields(nil)}
+	err := &cherry.Err{Message: "Database error", StatusHTTP: 500, ID: cherry.ErrID{SID: "volume-manager", Kind: 0x5}, Details: []string(nil), Fields: cherry.Fields(nil)}
 	for _, param := range params {
 		param(err)
 	}
@@ -88,31 +74,7 @@ func ErrDatabase(params ...func(*cherry.Err)) *cherry.Err {
 }
 
 func ErrResourceNotExists(params ...func(*cherry.Err)) *cherry.Err {
-	err := &cherry.Err{Message: "Resource not exists", StatusHTTP: 404, ID: cherry.ErrID{SID: "permissions", Kind: 0x7}, Details: []string(nil), Fields: cherry.Fields(nil)}
-	for _, param := range params {
-		param(err)
-	}
-	for i, detail := range err.Details {
-		det := renderTemplate(detail)
-		err.Details[i] = det
-	}
-	return err
-}
-
-func ErrSetOwnerAccess(params ...func(*cherry.Err)) *cherry.Err {
-	err := &cherry.Err{Message: "Owner can`t set access to its resource", StatusHTTP: 400, ID: cherry.ErrID{SID: "permissions", Kind: 0x8}, Details: []string(nil), Fields: cherry.Fields(nil)}
-	for _, param := range params {
-		param(err)
-	}
-	for i, detail := range err.Details {
-		det := renderTemplate(detail)
-		err.Details[i] = det
-	}
-	return err
-}
-
-func ErrResourceNotOwned(params ...func(*cherry.Err)) *cherry.Err {
-	err := &cherry.Err{Message: "Resource not owned by user", StatusHTTP: 400, ID: cherry.ErrID{SID: "permissions", Kind: 0x9}, Details: []string(nil), Fields: cherry.Fields(nil)}
+	err := &cherry.Err{Message: "Resource not exists", StatusHTTP: 404, ID: cherry.ErrID{SID: "volume-manager", Kind: 0x6}, Details: []string(nil), Fields: cherry.Fields(nil)}
 	for _, param := range params {
 		param(err)
 	}
@@ -124,7 +86,7 @@ func ErrResourceNotOwned(params ...func(*cherry.Err)) *cherry.Err {
 }
 
 func ErrResourceAlreadyExists(params ...func(*cherry.Err)) *cherry.Err {
-	err := &cherry.Err{Message: "Resource already exists", StatusHTTP: 400, ID: cherry.ErrID{SID: "permissions", Kind: 0xa}, Details: []string(nil), Fields: cherry.Fields(nil)}
+	err := &cherry.Err{Message: "Resource already exists", StatusHTTP: 400, ID: cherry.ErrID{SID: "volume-manager", Kind: 0x7}, Details: []string(nil), Fields: cherry.Fields(nil)}
 	for _, param := range params {
 		param(err)
 	}
@@ -136,7 +98,7 @@ func ErrResourceAlreadyExists(params ...func(*cherry.Err)) *cherry.Err {
 }
 
 func ErrQuotaExceeded(params ...func(*cherry.Err)) *cherry.Err {
-	err := &cherry.Err{Message: "Resource quota exceeded", StatusHTTP: 400, ID: cherry.ErrID{SID: "permissions", Kind: 0xb}, Details: []string(nil), Fields: cherry.Fields(nil)}
+	err := &cherry.Err{Message: "Resource quota exceeded", StatusHTTP: 400, ID: cherry.ErrID{SID: "volume-manager", Kind: 0x8}, Details: []string(nil), Fields: cherry.Fields(nil)}
 	for _, param := range params {
 		param(err)
 	}
@@ -148,7 +110,7 @@ func ErrQuotaExceeded(params ...func(*cherry.Err)) *cherry.Err {
 }
 
 func ErrNoFreeStorages(params ...func(*cherry.Err)) *cherry.Err {
-	err := &cherry.Err{Message: "No free storages found for volume", StatusHTTP: 507, ID: cherry.ErrID{SID: "permissions", Kind: 0xc}, Details: []string(nil), Fields: cherry.Fields(nil)}
+	err := &cherry.Err{Message: "No free storages found for volume", StatusHTTP: 507, ID: cherry.ErrID{SID: "volume-manager", Kind: 0x9}, Details: []string(nil), Fields: cherry.Fields(nil)}
 	for _, param := range params {
 		param(err)
 	}
@@ -160,7 +122,7 @@ func ErrNoFreeStorages(params ...func(*cherry.Err)) *cherry.Err {
 }
 
 func ErrStorageDelete(params ...func(*cherry.Err)) *cherry.Err {
-	err := &cherry.Err{Message: "Can`t delete storage with volumes", StatusHTTP: 400, ID: cherry.ErrID{SID: "permissions", Kind: 0xd}, Details: []string(nil), Fields: cherry.Fields(nil)}
+	err := &cherry.Err{Message: "Can`t delete storage with volumes", StatusHTTP: 400, ID: cherry.ErrID{SID: "volume-manager", Kind: 0xa}, Details: []string(nil), Fields: cherry.Fields(nil)}
 	for _, param := range params {
 		param(err)
 	}

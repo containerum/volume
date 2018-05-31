@@ -1,3 +1,8 @@
+required = [
+  "github.com/containerum/bill-external",
+  "github.com/containerum/kube-client"
+]
+
 [prune]
   go-tests = true
   unused-packages = true
@@ -13,6 +18,10 @@
 
   [[prune.project]]
     name = "github.com/containerum/cherry"
+    non-go = false
+
+  [[prune.project]]
+    name = "github.com/containerum/bill-external"
     non-go = false
 
 [[constraint]]
