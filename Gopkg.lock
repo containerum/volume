@@ -49,6 +49,12 @@
   version = "v1.2"
 
 [[projects]]
+  name = "github.com/go-pg/migrations"
+  packages = ["."]
+  revision = "91a824bb86a910befc819700ec6e21858c41b022"
+  version = "v6.2.0"
+
+[[projects]]
   name = "github.com/go-pg/pg"
   packages = [
     ".",
@@ -194,6 +200,12 @@
   version = "v1.6"
 
 [[projects]]
+  branch = "v2"
+  name = "gopkg.in/urfave/cli.v2"
+  packages = ["."]
+  revision = "d3ae77c26ac8db90639677e4831a728d33c36111"
+
+[[projects]]
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
@@ -202,6 +214,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6f63b3dd44ed152f5780d75d7344b8dd1610865aba06b2b95de3b2251d65372d"
+  inputs-digest = "395dc2557873c68f698ec94c6b9447cdfc5738a7b146271d03fe1d010c6f2e74"
   solver-name = "gps-cdcl"
   solver-version = 1
