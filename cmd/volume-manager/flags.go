@@ -50,7 +50,7 @@ var (
 	ListenAddrFlag = cli.StringFlag{
 		Name:    "listen_addr",
 		EnvVars: []string{"LISTEN_ADDR"},
-		Value:   ":4242",
+		Value:   ":4343",
 	}
 
 	BillingAddrFlag = cli.StringFlag{
