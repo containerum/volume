@@ -14,11 +14,11 @@ type Storage struct {
 	// swagger:strfmt uuid
 	ID string `sql:"id,pk,type:uuid,default:uuid_generate_v4()" json:"id,omitempty"`
 
-	Name string `sql:"name,notnull,unique" json:"name"`
+	Name string `sql:"name,notnull,unique" json:"name" binding:"required"`
 
-	Size int `sql:"size,notnull" json:"size"`
+	Size int `sql:"size,notnull" json:"size" binding:"gt=0"`
 
-	Used int `sql:"used,notnull" json:"used"`
+	Used int `sql:"used,notnull" json:"used" binding:"gt=0,ltecsfield=Size"`
 
 	Volumes []*Volume `pg:"fk:storage_id" sql:"-" json:"volumes"`
 }
@@ -60,6 +60,6 @@ func (s *Storage) BeforeDelete(db orm.DB) error {
 // swagger:model
 type UpdateStorageRequest struct {
 	Name     *string  `json:"name,omitempty"`
-	Size     *int     `json:"size,omitempty"`
-	Replicas *int     `json:"replicas,omitempty"`
+	Size     *int     `json:"size,omitempty" binding:"omitempty,gt=0,gtecsfield=Used"`
+	Used     *int     `json:"size,omitempty"`
 }
