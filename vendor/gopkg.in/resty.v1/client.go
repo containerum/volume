@@ -6,7 +6,6 @@ package resty
 
 import (
 	"bytes"
-	"compress/gzip"
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
@@ -47,19 +46,18 @@ const (
 )
 
 var (
-	hdrUserAgentKey       = http.CanonicalHeaderKey("User-Agent")
-	hdrAcceptKey          = http.CanonicalHeaderKey("Accept")
-	hdrContentTypeKey     = http.CanonicalHeaderKey("Content-Type")
-	hdrContentLengthKey   = http.CanonicalHeaderKey("Content-Length")
-	hdrContentEncodingKey = http.CanonicalHeaderKey("Content-Encoding")
-	hdrAuthorizationKey   = http.CanonicalHeaderKey("Authorization")
+	hdrUserAgentKey     = http.CanonicalHeaderKey("User-Agent")
+	hdrAcceptKey        = http.CanonicalHeaderKey("Accept")
+	hdrContentTypeKey   = http.CanonicalHeaderKey("Content-Type")
+	hdrContentLengthKey = http.CanonicalHeaderKey("Content-Length")
+	hdrAuthorizationKey = http.CanonicalHeaderKey("Authorization")
 
 	plainTextType   = "text/plain; charset=utf-8"
 	jsonContentType = "application/json; charset=utf-8"
 	formContentType = "application/x-www-form-urlencoded"
 
-	jsonCheck = regexp.MustCompile(`(?i:(application|text)/(problem\+json|json))`)
-	xmlCheck  = regexp.MustCompile(`(?i:(application|text)/(problem\+xml|xml))`)
+	jsonCheck = regexp.MustCompile("(?i:[application|text]/json)")
+	xmlCheck  = regexp.MustCompile("(?i:[application|text]/xml)")
 
 	hdrUserAgentValue = "go-resty v%s - https://github.com/go-resty/resty"
 	bufPool           = &sync.Pool{New: func() interface{} { return &bytes.Buffer{} }}
@@ -506,21 +504,21 @@ func (c *Client) AddRetryCondition(condition RetryConditionFunc) *Client {
 	return c
 }
 
-// SetHTTPMode method sets go-resty mode to 'http'
+// SetHTTPMode method sets go-resty mode into HTTP
 func (c *Client) SetHTTPMode() *Client {
 	return c.SetMode("http")
 }
 
-// SetRESTMode method sets go-resty mode to 'rest'
+// SetRESTMode method sets go-resty mode into RESTful
 func (c *Client) SetRESTMode() *Client {
 	return c.SetMode("rest")
 }
 
 // SetMode method sets go-resty client mode to given value such as 'http' & 'rest'.
-//	'rest':
+// 	RESTful:
 //		- No Redirect
 //		- Automatic response unmarshal if it is JSON or XML
-//	'http':
+//	HTML:
 //		- Up to 10 Redirects
 //		- No automatic unmarshall. Response will be treated as `response.String()`
 //
@@ -799,21 +797,11 @@ func (c *Client) execute(req *Request) (*Response, error) {
 	}
 
 	if !req.isSaveResponse {
-		defer closeq(resp.Body)
-		body := resp.Body
+		defer func() {
+			_ = resp.Body.Close()
+		}()
 
-		// GitHub #142
-		if strings.EqualFold(resp.Header.Get(hdrContentEncodingKey), "gzip") {
-			if _, ok := body.(*gzip.Reader); !ok {
-				body, err = gzip.NewReader(body)
-				if err != nil {
-					return response, err
-				}
-				defer closeq(body)
-			}
-		}
-
-		if response.body, err = ioutil.ReadAll(body); err != nil {
+		if response.body, err = ioutil.ReadAll(resp.Body); err != nil {
 			return response, err
 		}
 
@@ -857,10 +845,6 @@ func (c *Client) getTLSConfig() (*tls.Config, error) {
 // returns `*http.Transport` currently in use or error
 // in case currently used `transport` is not an `*http.Transport`
 func (c *Client) getTransport() (*http.Transport, error) {
-	if c.httpClient.Transport == nil {
-		c.SetTransport(new(http.Transport))
-	}
-
 	if transport, ok := c.httpClient.Transport.(*http.Transport); ok {
 		return transport, nil
 	}
@@ -885,8 +869,8 @@ func (f *File) String() string {
 
 // multipartField represent custom data part for multipart request
 type multipartField struct {
-	Param       string
-	FileName    string
+	Param string
+	FileName string
 	ContentType string
 	io.Reader
 }

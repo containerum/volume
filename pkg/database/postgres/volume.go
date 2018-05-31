@@ -10,20 +10,22 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (pgdb *PgDB) VolumeByID(ctx context.Context, id string) (ret model.Volume, err error) {
+func (pgdb *PgDB) VolumeByLabel(ctx context.Context, nsID, label string) (ret model.Volume, err error) {
 	pgdb.log.WithFields(logrus.Fields{
-		"id": id,
+		"ns_id": nsID,
+		"label": label,
 	}).Debugf("get volume by id")
 
-	ret.ID = id
+	ret.NamespaceID = nsID
+	ret.Label = label
 	err = pgdb.db.Model(&ret).
 		ColumnExpr("?TableAlias.*").
-		Column("Permission").
-		WherePK().
+		Where("ns_id = ?ns_id").
+		Where("label = ?label").
 		Select()
 	switch err {
 	case pg.ErrNoRows:
-		err = errors.ErrResourceNotExists().AddDetailF("volume with id %s not exists", id)
+		err = errors.ErrResourceNotExists().AddDetailF("volume with %s not exists", label)
 	default:
 		err = pgdb.handleError(err)
 	}

@@ -296,6 +296,9 @@ func createClient(hc *http.Client) *Client {
 	// Log Prefix
 	c.SetLogPrefix("RESTY ")
 
+	// Default transport
+	c.SetTransport(&http.Transport{})
+
 	// Default redirect policy
 	c.SetRedirectPolicy(NoRedirectPolicy())
 

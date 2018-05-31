@@ -254,9 +254,3 @@ func composeRequestURL(pathURL string, c *Client, r *Request) string {
 
 	return reqURL
 }
-
-func closeq(v interface{}) {
-	if c, ok := v.(io.Closer); ok {
-		_ = c.Close()
-	}
-}

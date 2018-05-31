@@ -14,12 +14,12 @@ import (
 type VolumeActions interface {
 	AdminCreateVolume(ctx context.Context, nsID string, req model.AdminVolumeCreateRequest) error
 	CreateVolume(ctx context.Context, nsID string, req model.VolumeCreateRequest) error
-	RenameVolume(ctx context.Context, id, newLabel string) error
+	RenameVolume(ctx context.Context, nsID, oldLabel, newLabel string) error
 	ResizeVolume(ctx context.Context, id string, newTariffID string) error
-	GetVolume(ctx context.Context, id string) (kubeClientModel.Volume, error)
+	GetVolume(ctx context.Context, nsID, label string) (kubeClientModel.Volume, error)
 	GetUserVolumes(ctx context.Context, filters ...string) ([]kubeClientModel.Volume, error)
 	GetAllVolumes(ctx context.Context, page, perPage int, filters ...string) ([]kubeClientModel.Volume, error)
-	DeleteVolume(ctx context.Context, id string) error
+	DeleteVolume(ctx context.Context, nsID, label string) error
 	DeleteAllUserVolumes(ctx context.Context) error
 }
 
@@ -119,14 +119,15 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 	return err
 }
 
-func (s *Server) GetVolume(ctx context.Context, id string) (kubeClientModel.Volume, error) {
+func (s *Server) GetVolume(ctx context.Context, nsID, label string) (kubeClientModel.Volume, error) {
 	userID := httputil.MustGetUserID(ctx)
 	s.log.WithFields(logrus.Fields{
 		"user_id": userID,
-		"id":      id,
+		"ns_id":   nsID,
+		"label":   label,
 	}).Infof("get volume")
 
-	vol, err := s.db.VolumeByID(ctx, id)
+	vol, err := s.db.VolumeByLabel(ctx, nsID, label)
 	if err != nil {
 		return vol.ToKube(), err
 	}
@@ -190,15 +191,16 @@ func (s *Server) GetAllVolumes(ctx context.Context, page, perPage int, filters .
 	return ret, nil
 }
 
-func (s *Server) DeleteVolume(ctx context.Context, id string) error {
+func (s *Server) DeleteVolume(ctx context.Context, nsID, label string) error {
 	userID := httputil.MustGetUserID(ctx)
 	s.log.WithFields(logrus.Fields{
 		"user_id": userID,
-		"id":      id,
+		"ns_id":   nsID,
+		"label":   label,
 	}).Infof("delete volume")
 
 	err := s.db.Transactional(func(tx database.DB) error {
-		vol, getErr := tx.VolumeByID(ctx, id)
+		vol, getErr := tx.VolumeByLabel(ctx, nsID, label)
 		if getErr != nil {
 			return getErr
 		}
@@ -249,16 +251,17 @@ func (s *Server) DeleteAllUserVolumes(ctx context.Context) error {
 	return err
 }
 
-func (s *Server) RenameVolume(ctx context.Context, id, newLabel string) error {
+func (s *Server) RenameVolume(ctx context.Context, nsID, oldLabel, newLabel string) error {
 	userID := httputil.MustGetUserID(ctx)
 	s.log.WithFields(logrus.Fields{
-		"user_id": userID,
-		"id":      id,
-		"new_id":  newLabel,
+		"user_id":   userID,
+		"ns_id":     nsID,
+		"old_label": oldLabel,
+		"new_label": newLabel,
 	}).Infof("rename volume")
 
 	err := s.db.Transactional(func(tx database.DB) error {
-		vol, getErr := tx.VolumeByID(ctx, id)
+		vol, getErr := tx.VolumeByLabel(ctx, nsID, oldLabel)
 		if getErr != nil {
 			return getErr
 		}
@@ -281,11 +284,12 @@ func (s *Server) RenameVolume(ctx context.Context, id, newLabel string) error {
 	return err
 }
 
-func (s *Server) ResizeVolume(ctx context.Context, id string, newTariffID string) error {
+func (s *Server) ResizeVolume(ctx context.Context, nsID, label string, newTariffID string) error {
 	userID := httputil.MustGetUserID(ctx)
 	s.log.WithFields(logrus.Fields{
 		"user_id":       userID,
-		"id":            id,
+		"ns_id":         nsID,
+		"label":         label,
 		"new_tariff_id": newTariffID,
 	}).Infof("resize volume")
 
@@ -299,7 +303,7 @@ func (s *Server) ResizeVolume(ctx context.Context, id string, newTariffID string
 	}
 
 	err = s.db.Transactional(func(tx database.DB) error {
-		vol, getErr := tx.VolumeByID(ctx, id)
+		vol, getErr := tx.VolumeByLabel(ctx, nsID, label)
 		if getErr != nil {
 			return getErr
 		}
