@@ -33,10 +33,22 @@
   version = "v1.0.3"
 
 [[projects]]
+  name = "github.com/gin-contrib/cors"
+  packages = ["."]
+  revision = "cf4846e6a636a76237a28d9286f163c132e841bc"
+  version = "v1.2"
+
+[[projects]]
   branch = "master"
   name = "github.com/gin-contrib/sse"
   packages = ["."]
   revision = "22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/gin-gonic/contrib"
+  packages = ["ginrus"]
+  revision = "6ea35d32286ce194572a0dc2a3398aac0091228d"
 
 [[projects]]
   name = "github.com/gin-gonic/gin"
@@ -219,6 +231,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "22dbbdb10742985d12be24666b2cf5c3b4268216a84bfa0472f14dc8b78dc661"
+  inputs-digest = "c87c20bf5ec7ac8bbc77dd6263315144f9a333d218672f23d9d2b3ed6f2ad7cf"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -24,14 +24,14 @@ func init() {
 		}
 
 		if _, err := db.Model(&model.Volume{}).
-			Exec( /* language=sql */ `CREATE UNIQUE INDEX unique_vol_owner_label ON "?TableName" ("owner_user_id", "label") WHERE NOT deleted`); err != nil {
+			Exec( /* language=sql */ `CREATE UNIQUE INDEX unique_vol_ns_label ON "?TableName" ("ns_id", "label") WHERE NOT deleted`); err != nil {
 			return err
 		}
 
 		return nil
 	}, func(db migrations.DB) error {
 		if _, err := db.Model(&model.Volume{}).
-			Exec( /* language=sql */ `DROP INDEX IF EXISTS unique_vol_owner_label`); err != nil {
+			Exec( /* language=sql */ `DROP INDEX IF EXISTS unique_vol_ns_label`); err != nil {
 			return err
 		}
 

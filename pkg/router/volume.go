@@ -113,7 +113,7 @@ func (vh *volumeHandlers) resizeVolumeHandler(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(vh.tv.BadRequest(ctx, err))
 		return
 	}
-	if err := vh.acts.ResizeVolume(ctx.Request.Context(), ctx.Param("label"), req.TariffID); err != nil {
+	if err := vh.acts.ResizeVolume(ctx.Request.Context(), ctx.Param("ns_id"), ctx.Param("label"), req.TariffID); err != nil {
 		ctx.AbortWithStatusJSON(vh.tv.HandleError(err))
 		return
 	}

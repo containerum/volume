@@ -39,7 +39,7 @@ var (
 	DBBaseFlag = cli.StringFlag{
 		Name:    "db_base",
 		EnvVars: []string{"DB_BASE"},
-		Value:   "permissions",
+		Value:   "volumes",
 	}
 
 	DBSSLModeFlag = cli.BoolFlag{

@@ -61,7 +61,7 @@ func (sh *storageHandlers) deleteStorageHandler(ctx *gin.Context) {
 	ctx.Status(http.StatusAccepted)
 }
 
-func (r *Router) SetupStorageRoutes(acts server.StorageActions) {
+func (r *Router) SetupStorageHandlers(acts server.StorageActions) {
 	handlers := &storageHandlers{tv: r.tv, acts: acts}
 
 	group := r.engine.Group("/storages", httputil.RequireAdminRole(errors.ErrAdminRequired))

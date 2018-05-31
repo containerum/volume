@@ -15,7 +15,7 @@ type VolumeActions interface {
 	AdminCreateVolume(ctx context.Context, nsID string, req model.AdminVolumeCreateRequest) error
 	CreateVolume(ctx context.Context, nsID string, req model.VolumeCreateRequest) error
 	RenameVolume(ctx context.Context, nsID, oldLabel, newLabel string) error
-	ResizeVolume(ctx context.Context, id string, newTariffID string) error
+	ResizeVolume(ctx context.Context, nsID, label string, newTariffID string) error
 	GetVolume(ctx context.Context, nsID, label string) (kubeClientModel.Volume, error)
 	GetUserVolumes(ctx context.Context, filters ...string) ([]kubeClientModel.Volume, error)
 	GetAllVolumes(ctx context.Context, page, perPage int, filters ...string) ([]kubeClientModel.Volume, error)
