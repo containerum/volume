@@ -8,9 +8,11 @@ import (
 )
 
 type DB interface {
+	StorageByName(ctx context.Context, name string) (model.Storage, error)
+	LeastUsedStorage(ctx context.Context) (model.Storage, error)
 	Storages(ctx context.Context) ([]model.Storage, error)
 	CreateStorage(ctx context.Context, storage *model.Storage) error
-	UpdateStorage(ctx context.Context, storage model.Storage) error
+	UpdateStorage(ctx context.Context, name string, storage model.Storage) error
 	DeleteStorage(ctx context.Context, storage model.Storage) error
 
 	VolumeByLabel(ctx context.Context, userID, label string) (model.Volume, error)

@@ -3,7 +3,10 @@
 
 [[projects]]
   name = "github.com/containerum/cherry"
-  packages = ["."]
+  packages = [
+    ".",
+    "adaptors/cherrylog"
+  ]
   revision = "34f7a2a139b36c20a34b93738dda33476efad47d"
   version = "v1.0.1"
 
@@ -62,6 +65,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "cd1620aadb574694ae106c7bf653380b036ddf50b5bd21b20759afe70d7bd29c"
+  inputs-digest = "b557e515850e98cd7be67e53796183f5c841cfaf6e89e511a586fef71880b121"
   solver-name = "gps-cdcl"
   solver-version = 1

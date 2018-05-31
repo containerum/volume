@@ -1,6 +1,7 @@
 [prune]
   go-tests = true
   unused-packages = true
+  non-go = true
 
   [[prune.project]]
       name = "github.com/containerum/kube-client"
