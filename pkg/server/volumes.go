@@ -3,11 +3,11 @@ package server
 import (
 	"context"
 
-	"git.containerum.net/ch/utils/httputil"
 	"git.containerum.net/ch/volume-manager/pkg/database"
 	"git.containerum.net/ch/volume-manager/pkg/models"
 	billing "github.com/containerum/bill-external/models"
 	kubeClientModel "github.com/containerum/kube-client/pkg/model"
+	"github.com/containerum/utils/httputil"
 	"github.com/sirupsen/logrus"
 )
 
@@ -126,7 +126,7 @@ func (s *Server) GetVolume(ctx context.Context, id string) (kubeClientModel.Volu
 		"id":      id,
 	}).Infof("get volume")
 
-	vol, err := s.db.VolumeByID(ctx, userID, id)
+	vol, err := s.db.VolumeByID(ctx, id)
 	if err != nil {
 		return vol.ToKube(), err
 	}
@@ -148,7 +148,7 @@ func (s *Server) GetUserVolumes(ctx context.Context, filters ...string) ([]kubeC
 		filter = StandardVolumeFilter
 	}
 
-	vols, err := s.db.UserVolumes(ctx, userID, filter)
+	vols, err := s.db.VolumesByIDs(ctx, nil /* TODO */, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -198,7 +198,7 @@ func (s *Server) DeleteVolume(ctx context.Context, id string) error {
 	}).Infof("delete volume")
 
 	err := s.db.Transactional(func(tx database.DB) error {
-		vol, getErr := tx.VolumeByID(ctx, userID, id)
+		vol, getErr := tx.VolumeByID(ctx, id)
 		if getErr != nil {
 			return getErr
 		}
@@ -224,15 +224,19 @@ func (s *Server) DeleteAllUserVolumes(ctx context.Context) error {
 	s.log.WithField("user_id", userID).Infof("delete all user volumes")
 
 	err := s.db.Transactional(func(tx database.DB) error {
-		deletedVols, delErr := tx.DeleteAllUserVolumes(ctx, userID)
-		if delErr != nil {
+		vols, err := s.db.VolumesByIDs(ctx, nil /* TODO */, StandardVolumeFilter)
+		if err != nil {
+			return err
+		}
+
+		if delErr := tx.DeleteVolumes(ctx, vols); delErr != nil {
 			return delErr
 		}
 
 		// TODO: actually delete it
 
 		var resourceIDs []string
-		for _, v := range deletedVols {
+		for _, v := range vols {
 			resourceIDs = append(resourceIDs, v.ID)
 		}
 		if unsubErr := s.clients.Billing.MassiveUnsubscribe(ctx, resourceIDs); unsubErr != nil {
@@ -254,7 +258,7 @@ func (s *Server) RenameVolume(ctx context.Context, id, newLabel string) error {
 	}).Infof("rename volume")
 
 	err := s.db.Transactional(func(tx database.DB) error {
-		vol, getErr := tx.VolumeByID(ctx, userID, id)
+		vol, getErr := tx.VolumeByID(ctx, id)
 		if getErr != nil {
 			return getErr
 		}
@@ -295,7 +299,7 @@ func (s *Server) ResizeVolume(ctx context.Context, id string, newTariffID string
 	}
 
 	err = s.db.Transactional(func(tx database.DB) error {
-		vol, getErr := tx.VolumeByID(ctx, userID, id)
+		vol, getErr := tx.VolumeByID(ctx, id)
 		if getErr != nil {
 			return getErr
 		}

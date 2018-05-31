@@ -15,12 +15,12 @@ type DB interface {
 	UpdateStorage(ctx context.Context, name string, storage model.Storage) error
 	DeleteStorage(ctx context.Context, storage *model.Storage) error
 
-	VolumeByID(ctx context.Context, userID, label string) (model.Volume, error)
-	UserVolumes(ctx context.Context, userID string, filter VolumeFilter) ([]model.Volume, error)
+	VolumeByID(ctx context.Context, id string) (model.Volume, error)
+	VolumesByIDs(ctx context.Context, ids []string, filter VolumeFilter) ([]model.Volume, error)
 	AllVolumes(ctx context.Context, filter VolumeFilter) ([]model.Volume, error)
 	CreateVolume(ctx context.Context, volume *model.Volume) error
 	DeleteVolume(ctx context.Context, volume *model.Volume) error
-	DeleteAllUserVolumes(ctx context.Context, userID string) ([]model.Volume, error)
+	DeleteVolumes(ctx context.Context, volumes []model.Volume) error
 	UpdateVolume(ctx context.Context, volume *model.Volume) error
 
 	Transactional(func(tx DB) error) error
