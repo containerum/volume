@@ -27,3 +27,6 @@
   name = "github.com/sirupsen/logrus"
   version = "1.0.5"
 
+[[constraint]]
+  name = "github.com/containerum/bill-external"
+  version = "1.0.0"

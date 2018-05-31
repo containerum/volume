@@ -5,12 +5,14 @@ import (
 	"io"
 	"reflect"
 
+	"git.containerum.net/ch/volume-manager/pkg/clients"
 	"git.containerum.net/ch/volume-manager/pkg/database"
 	"github.com/containerum/cherry/adaptors/cherrylog"
 	"github.com/sirupsen/logrus"
 )
 
 type Clients struct {
+	Billing clients.BillingClient
 }
 
 func (c *Clients) Close() error {
