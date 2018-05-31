@@ -56,6 +56,6 @@ func (s *Server) DeleteStorage(ctx context.Context, name string) error {
 		if err != nil {
 			return err
 		}
-		return tx.DeleteStorage(ctx, storage)
+		return tx.DeleteStorage(ctx, &storage)
 	})
 }

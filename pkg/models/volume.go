@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	"git.containerum.net/ch/volume-manager/pkg/errors"
 	"github.com/containerum/kube-client/pkg/model"
 	"github.com/go-pg/pg"
@@ -19,8 +21,6 @@ type Volume struct {
 
 	// swagger:strfmt uuid
 	NamespaceID string `sql:"ns_id,type:uuid" json:"namespace_id,omitempty"`
-
-	GlusterName string `sql:"gluster_name,notnull" json:"gluster_name,omitempty"`
 
 	// swagger:strfmt uuid
 	StorageID string `sql:"storage_id,type:uuid,notnull" json:"storage_id,omitempty"`
@@ -76,10 +76,30 @@ func (v *Volume) AfterSelect(db orm.DB) error {
 		Select(pg.Scan(&v.StorageName))
 }
 
+func (v *Volume) ToKube() model.Volume {
+	vol := model.Volume{
+		Name: v.Label,
+		CreatedAt: func() *string {
+			t := v.CreateTime.Format(time.RFC3339)
+			return &t
+		}(),
+		TariffID: func() string {
+			if v.TariffID == nil {
+				return ""
+			}
+			return *v.TariffID
+		}(),
+		Capacity:    uint(v.Capacity),
+		StorageName: v.StorageName,
+		AccessMode:  v.AccessMode,
+	}
+
+	return vol
+}
+
 func (v *Volume) Mask() {
 	v.Resource.Mask()
 	v.NamespaceID = ""
-	v.GlusterName = ""
 	v.StorageID = ""
 	v.AccessMode = ""
 }
@@ -88,6 +108,14 @@ func (v *Volume) Mask() {
 //
 // swagger:model
 type VolumeCreateRequest = model.CreateVolume
+
+// AdminVolumeCreateRequest is a request object for creating volume as admin (without billing)
+//
+// swagger:model
+type AdminVolumeCreateRequest struct {
+	Label    string `json:"label" binding:"required"`
+	Capacity int    `json:"capacity" binding:"gt=0"`
+}
 
 // VolumeRenameRequest is a request object for renaming volume
 //
