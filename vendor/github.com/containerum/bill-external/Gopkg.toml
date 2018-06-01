@@ -1,0 +1,12 @@
+[prune]
+  go-tests = true
+  unused-packages = true
+  non-go = true
+
+  [[prune.project]]
+    name = "github.com/containerum/cherry"
+    non-go = false
+
+[[constraint]]
+  name = "github.com/containerum/cherry"
+  version = "1.0.1-rc2"

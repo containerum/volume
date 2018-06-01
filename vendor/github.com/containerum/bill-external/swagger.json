@@ -1,0 +1,446 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "The Billing Manager API project is used for actions with tariffs and subscriptions.",
+    "title": "Billing Manager API.",
+    "license": {
+      "name": "Apache License, Vesion 2.0"
+    },
+    "version": "1.0"
+  },
+  "paths": {
+    "/tariffs/namespace/{tariff_id}": {
+      "get": {
+        "tags": [
+          "Tariffs"
+        ],
+        "summary": "Get namespace tariff by ID.",
+        "operationId": "GetNamespaceTariff",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "uuid",
+            "name": "tariff_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "namespace tariff",
+            "schema": {
+              "$ref": "#/definitions/NamespaceTariff"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/error"
+          }
+        }
+      }
+    },
+    "/tariffs/volume/{tariff_id}": {
+      "get": {
+        "tags": [
+          "Tariffs"
+        ],
+        "summary": "Get volume tariff by ID.",
+        "operationId": "GetVolumeTariff",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "uuid",
+            "name": "tariff_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "volume tariff",
+            "schema": {
+              "$ref": "#/definitions/VolumeTariff"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/error"
+          }
+        }
+      }
+    },
+    "/isp/subscription": {
+      "post": {
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Subscribe user to tariff whenever he adds a namespace or volume.",
+        "operationId": "SubscribeTariff",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SubscribeTariffRequest"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "successfully subscribed"
+          },
+          "default": {
+            "$ref": "#/responses/error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Unsubscribe user from every tariff",
+        "operationId": "MassiveUnsubscribeTariff",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MassiveUnsubscribeTariffRequest"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "successfully unsubscribed"
+          },
+          "default": {
+            "$ref": "#/responses/error"
+          }
+        }
+      }
+    },
+    "isp/subscription/{resource_id}": {
+      "put": {
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Change tariff in subscription",
+        "operationId": "ChangeTariffRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "uuid",
+            "name": "resource_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ChangeTariffRequest"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "successfully changed"
+          },
+          "default": {
+            "$ref": "#/responses/error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Unsubscribe user from tariff",
+        "operationId": "UnsubscribeTariff",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "uuid",
+            "name": "resource_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "successfully unsubscribed"
+          },
+          "default": {
+            "$ref": "#/responses/error"
+          }
+        }
+      }
+    },
+    "/resources/{resource_id}": {
+      "put": {
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Rename resource",
+        "operationId": "RenameRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "uuid",
+            "name": "resource_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RenameRequest"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "successfully changed"
+          },
+          "default": {
+            "$ref": "#/responses/error"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "NamespaceTariff": {
+      "description": "NamespaceTariff represents billing tariff for namespace\nIf VolumeSize provided non-persistent volume will be created.",
+      "type": "object",
+      "properties": {
+        "billing_id": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "BillingID"
+        },
+        "cpu_limit": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "CPULimit"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
+        "description": {
+          "type": "string",
+          "x-go-name": "Description"
+        },
+        "external_services": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "ExternalServices"
+        },
+        "id": {
+          "type": "string",
+          "x-go-name": "ID"
+        },
+        "internal_services": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "InternalServices"
+        },
+        "is_active": {
+          "type": "boolean",
+          "x-go-name": "Active"
+        },
+        "is_public": {
+          "type": "boolean",
+          "x-go-name": "Public"
+        },
+        "label": {
+          "type": "string",
+          "x-go-name": "Label"
+        },
+        "memory_limit": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "MemoryLimit"
+        },
+        "price": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Price"
+        },
+        "traffic": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Traffic"
+        },
+        "traffic_price": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "TrafficPrice"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "UpdatedAt"
+        },
+        "volume_size": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "VolumeSize"
+        }
+      },
+      "x-go-package": "github.com/containerum/bill-external/models"
+    },
+    "ResourceType": {
+      "type": "string",
+      "enum": [
+        "namespace",
+        "volume"
+      ]
+    },
+    "SubscribeTariffRequest": {
+      "description": "SubscribeTariffRequest contains parameters needed for tariff subscribing",
+      "type": "object",
+      "properties": {
+        "resource_id": {
+          "type": "string",
+          "x-go-name": "ResourceID"
+        },
+        "resource_label": {
+          "type": "string",
+          "x-go-name": "ResourceLabel"
+        },
+        "resource_type": {
+          "$ref": "#/definitions/ResourceType"
+        },
+        "tariff_id": {
+          "type": "string",
+          "x-go-name": "TariffID"
+        }
+      },
+      "x-go-package": "github.com/containerum/bill-external/models"
+    },
+    "ChangeTariffRequest": {
+      "description": "ChangeTariffRequest contains parameters needed for tariff changing in subscription",
+      "type": "object",
+      "properties": {
+        "tariff_id": {
+          "type": "string",
+          "x-go-name": "TariffID"
+        }
+      },
+      "x-go-package": "github.com/containerum/bill-external/models"
+    },
+    "MassiveUnsubscribeTariffRequest": {
+      "description": "MassiveUnsubscribeTariffRequest contains parameters needed for all tariffs unsubscribingg",
+      "type": "object",
+      "properties": {
+        "resources": {
+          "type": "array",
+          "x-go-name": "Resources",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "x-go-package": "github.com/containerum/bill-external/models"
+    },
+    "UnsubscribeTariffRequest": {
+      "description": "UnsubscribeTariffRequest contains parameters needed for tariff unsubscribing",
+      "type": "object",
+      "properties": {
+        "resource_id": {
+          "type": "string",
+          "x-go-name": "ResourceID"
+        }
+      },
+      "x-go-package": "github.com/containerum/bill-external/models"
+    },
+    "RenameRequest": {
+      "description": "RenameRequest contains parameters needed for resource renaming",
+      "type": "object",
+      "properties": {
+        "resource_label": {
+          "type": "string",
+          "x-go-name": "ResourceLabel"
+        }
+      },
+      "x-go-package": "github.com/containerum/bill-external/models"
+    },
+    "VolumeTariff": {
+      "description": "VolumeTariff represents billing tariff for (persistent) volume",
+      "type": "object",
+      "properties": {
+        "billing_id": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "BillingID"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
+        "description": {
+          "type": "string",
+          "x-go-name": "Description"
+        },
+        "id": {
+          "type": "string",
+          "x-go-name": "ID"
+        },
+        "is_active": {
+          "type": "boolean",
+          "x-go-name": "Active"
+        },
+        "is_public": {
+          "type": "boolean",
+          "x-go-name": "Public"
+        },
+        "label": {
+          "type": "string",
+          "x-go-name": "Label"
+        },
+        "price": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Price"
+        },
+        "replicas_limit": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "ReplicasLimit"
+        },
+        "storage_limit": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "StorageLimit"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "UpdatedAt"
+        }
+      },
+      "x-go-package": "github.com/containerum/bill-external/models"
+    }
+  },
+  "responses": {
+    "error": {
+      "description": "cherry error",
+      "schema": {
+        "$ref": "vendor/github.com/containerum/cherry/swagger.json#/definitions/Err"
+      }
+    }
+  }
+}
