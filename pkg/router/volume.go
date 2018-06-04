@@ -17,13 +17,13 @@ type volumeHandlers struct {
 	acts server.VolumeActions
 }
 
-func (vh *volumeHandlers) adminCreateVolumeHandler(ctx *gin.Context) {
-	var req model.AdminVolumeCreateRequest
+func (vh *volumeHandlers) directCreateVolumeHandler(ctx *gin.Context) {
+	var req model.DirectVolumeCreateRequest
 	if err := ctx.ShouldBindWith(&req, binding.JSON); err != nil {
 		ctx.AbortWithStatusJSON(vh.tv.BadRequest(ctx, err))
 		return
 	}
-	if err := vh.acts.AdminCreateVolume(ctx.Request.Context(), ctx.Param("ns_id"), req); err != nil {
+	if err := vh.acts.DirectCreateVolume(ctx.Request.Context(), ctx.Param("ns_id"), req); err != nil {
 		ctx.AbortWithStatusJSON(vh.tv.HandleError(err))
 		return
 	}
@@ -149,9 +149,9 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	group := r.engine.Group("/namespaces/:ns_id/volumes")
 	adminGroup := r.engine.Group("/admin/namespaces/:ns_id/volumes", httputil.RequireAdminRole(errors.ErrAdminRequired))
 
-	// swagger:operation POST /admin/namespaces/{ns_id}/volumes Volumes AdminCreateVolume
+	// swagger:operation POST /limits/namespaces/{ns_id}/volumes Volumes DirectCreateVolume
 	//
-	// Create volume for admin using only capacity.
+	// Create Volume using only capacity.
 	// Should be chosen first storage, where free space allows to create volume with provided capacity.
 	//
 	// ---
@@ -164,13 +164,13 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//    in: body
 	//    required: true
 	//    schema:
-	//      $ref: '#/definitions/AdminVolumeCreateRequest'
+	//      $ref: '#/definitions/DirectVolumeCreateRequest'
 	// responses:
 	//   '201':
 	//     description: volume created
 	//   default:
 	//     $ref: '#/responses/error'
-	adminGroup.POST("/", handlers.adminCreateVolumeHandler)
+	r.engine.POST("/limits/namespaces/:ns_id/volumes", handlers.directCreateVolumeHandler)
 
 	// swagger:operation POST /namespaces/{ns_id}/volumes Volumes CreateVolume
 	//
