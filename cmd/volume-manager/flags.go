@@ -58,6 +58,11 @@ var (
 		EnvVars: []string{"BILLING_ADDR"},
 	}
 
+	KubeAPIAddrFlag = cli.StringFlag{
+		Name:    "kube_api_addr",
+		EnvVars: []string{"KUBE_API_ADDR"},
+	}
+
 	CORSFlag = cli.BoolFlag{
 		Name: "cors",
 	}

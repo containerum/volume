@@ -97,6 +97,7 @@ func (b *BillingHTTPClient) Subscribe(ctx context.Context, req btypes.SubscribeT
 	}).Debugln("subscribing")
 
 	resp, err := b.client.R().
+		SetContext(ctx).
 		SetBody(req).
 		SetHeaders(httputil.RequestXHeadersMap(ctx)).
 		Post("/isp/subscription")
@@ -117,6 +118,7 @@ func (b *BillingHTTPClient) Rename(ctx context.Context, resourceID, newLabel str
 	}).Debugln("Rename")
 
 	resp, err := b.client.R().
+		SetContext(ctx).
 		SetHeaders(httputil.RequestXHeadersMap(ctx)).
 		SetBody(btypes.RenameRequest{
 			ResourceLabel: newLabel,
@@ -138,8 +140,12 @@ func (b *BillingHTTPClient) Unsubscribe(ctx context.Context, resourceID string) 
 	}).Debugln("unsubscribing")
 
 	resp, err := b.client.R().
+		SetContext(ctx).
 		SetHeaders(httputil.RequestXHeadersMap(ctx)).
-		Delete(fmt.Sprintf("/isp/subscription/%s", resourceID))
+		SetPathParams(map[string]string{
+			"resource": resourceID,
+		}).
+		Delete("/isp/subscription/{resource}")
 	if err != nil {
 		return err
 	}
@@ -154,6 +160,7 @@ func (b *BillingHTTPClient) MassiveUnsubscribe(ctx context.Context, resourceIDs 
 	b.log.WithField("resource_ids", resourceIDs).Debugln("massive unsubscribing")
 
 	resp, err := b.client.R().
+		SetContext(ctx).
 		SetHeaders(httputil.RequestXHeadersMap(ctx)).
 		SetBody(btypes.MassiveUnsubscribeTariffRequest{
 			Resources: resourceIDs,
@@ -176,7 +183,10 @@ func (b *BillingHTTPClient) GetVolumeTariff(ctx context.Context, tariffID string
 		SetContext(ctx).
 		SetHeaders(httputil.RequestXHeadersMap(ctx)).
 		SetResult(btypes.VolumeTariff{}).
-		Get(fmt.Sprintf("/tariffs/volume/%s", tariffID))
+		SetPathParams(map[string]string{
+			"tariff": tariffID,
+		}).
+		Get("/tariffs/volume/{tariff}")
 	if err != nil {
 		return btypes.VolumeTariff{}, err
 	}

@@ -88,12 +88,26 @@ func setupBillingClient(addr string) (clients.BillingClient, error) {
 	}
 }
 
+func setupKubeAPIClient(addr string) (clients.KubeAPIClient, error) {
+	switch {
+	case opMode == modeDebug && addr == "":
+		return clients.NewKubeAPIDummyClient(), nil
+	case addr != "":
+		return clients.NewKubeAPIHTTPClient(&url.URL{Scheme: "http", Host: addr}), nil
+	default:
+		return nil, errors.New("missing configuration for billing service")
+	}
+}
+
 func setupServiceClients(ctx *cli.Context) (*server.Clients, error) {
 	var errs []error
 	var clients server.Clients
 	var err error
 
 	if clients.Billing, err = setupBillingClient(ctx.String(BillingAddrFlag.Name)); err != nil {
+		errs = append(errs, err)
+	}
+	if clients.KubeAPI, err = setupKubeAPIClient(ctx.String(KubeAPIAddrFlag.Name)); err != nil {
 		errs = append(errs, err)
 	}
 

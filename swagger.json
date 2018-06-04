@@ -258,45 +258,6 @@
         }
       }
     },
-    "/namespaces/{ns_id}/volumes/{label}/rename": {
-      "put": {
-        "tags": [
-          "Volumes"
-        ],
-        "summary": "Rename volume.",
-        "operationId": "RenameVolume",
-        "parameters": [
-          {
-            "$ref": "#/parameters/UserIDHeader"
-          },
-          {
-            "$ref": "#/parameters/UserRoleHeader"
-          },
-          {
-            "$ref": "#/parameters/SubstitutedUserID"
-          },
-          {
-            "$ref": "#/parameters/NamespaceID"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/VolumeRenameRequest"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "volume renamed"
-          },
-          "default": {
-            "$ref": "#/responses/error"
-          }
-        }
-      }
-    },
     "/storages": {
       "get": {
         "tags": [
@@ -696,6 +657,18 @@
       "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
     },
     "CreateVolume": {
+      "description": "CreateVolume --",
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "x-go-name": "Label"
+        },
+        "tariff_id": {
+          "type": "string",
+          "x-go-name": "TariffID"
+        }
+      },
       "$ref": "vendor/github.com/containerum/kube-client/swagger.json#/definitions/CreateVolume"
     },
     "Deployment": {
@@ -783,6 +756,17 @@
           "type": "integer",
           "format": "int64",
           "x-go-name": "UpdatedReplicas"
+        }
+      },
+      "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
+    },
+    "DeploymentVersion": {
+      "description": "DeploymentVersion -- model for deployment version update",
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "x-go-name": "Version"
         }
       },
       "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
@@ -1254,6 +1238,14 @@
       "$ref": "vendor/github.com/containerum/bill-external/swagger.json#/definitions/ResourceType"
     },
     "ResourceUpdateName": {
+      "description": "ResourceUpdateName -- contains new resource name",
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "x-go-name": "Label"
+        }
+      },
       "$ref": "vendor/github.com/containerum/kube-client/swagger.json#/definitions/ResourceUpdateName"
     },
     "ResourceUpdateUserAccess": {
@@ -1528,11 +1520,6 @@
       "description": "Storage describes volumes storage",
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid",
-          "x-go-name": "ID"
-        },
         "name": {
           "type": "string",
           "x-go-name": "Name"
@@ -1688,6 +1675,10 @@
           "format": "uint64",
           "x-go-name": "MembersCount"
         },
+        "owner_login": {
+          "type": "string",
+          "x-go-name": "OwnerLogin"
+        },
         "owner_user_id": {
           "type": "string",
           "x-go-name": "OwnerID"
@@ -1820,35 +1811,44 @@
       "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
     },
     "Volume": {
-      "description": "Volume -- volume representation",
+      "description": "Volume describes volume",
       "type": "object",
       "properties": {
-        "access": {
-          "$ref": "#/definitions/AccessLevel"
-        },
         "access_mode": {
           "$ref": "#/definitions/PersistentVolumeAccessMode"
         },
         "capacity": {
           "type": "integer",
-          "format": "uint64",
+          "format": "int64",
           "x-go-name": "Capacity"
         },
-        "created_at": {
+        "create_time": {
           "type": "string",
-          "x-go-name": "CreatedAt"
+          "format": "date-time",
+          "x-go-name": "CreateTime"
         },
-        "name": {
+        "delete_time": {
           "type": "string",
-          "x-go-name": "Name"
+          "format": "date-time",
+          "x-go-name": "DeleteTime"
         },
-        "owner": {
-          "type": "string",
-          "x-go-name": "Owner"
+        "deleted": {
+          "type": "boolean",
+          "x-go-name": "Deleted"
         },
-        "owner_login": {
+        "id": {
           "type": "string",
-          "x-go-name": "OwnerLogin"
+          "format": "uuid",
+          "x-go-name": "ID"
+        },
+        "label": {
+          "type": "string",
+          "x-go-name": "Label"
+        },
+        "namespace_id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "NamespaceID"
         },
         "storage_name": {
           "type": "string",
@@ -1856,17 +1856,11 @@
         },
         "tariff_id": {
           "type": "string",
+          "format": "uuid",
           "x-go-name": "TariffID"
-        },
-        "users": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/UserAccess"
-          },
-          "x-go-name": "Users"
         }
       },
-      "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
+      "x-go-package": "git.containerum.net/ch/volume-manager/pkg/models"
     },
     "VolumeCreateRequest": {
       "description": "VolumeCreateRequest is a request object for creating volume",

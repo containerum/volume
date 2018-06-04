@@ -27,8 +27,8 @@
     ".",
     "pkg/model"
   ]
-  revision = "ea99fc8e4b53d482604ae1ea8ba7ff4a481a7bcb"
-  version = "v0.19.2"
+  revision = "f4426c78c32495020cc6f16c0a14367cb14444ad"
+  version = "v0.19.5"
 
 [[projects]]
   name = "github.com/containerum/utils"
@@ -220,8 +220,8 @@
 [[projects]]
   name = "gopkg.in/resty.v1"
   packages = ["."]
-  revision = "65798e030a35b911602b4d1d743d6f50ac93b665"
-  version = "v1.3"
+  revision = "fc3ad735b5565cada42d34bc298573fd3fe5adc6"
+  version = "v1.6"
 
 [[projects]]
   branch = "v2"
@@ -238,6 +238,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "25dcdef191b120c7f3ec142186790e8d0a06e6b7e3f315873da188b536446c08"
+  inputs-digest = "3bd398816279f35bfa939df68c5c77b5376eb1d771d459aabb0949999cff96ba"
   solver-name = "gps-cdcl"
   solver-version = 1

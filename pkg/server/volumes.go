@@ -14,7 +14,6 @@ import (
 type VolumeActions interface {
 	AdminCreateVolume(ctx context.Context, nsID string, req model.AdminVolumeCreateRequest) error
 	CreateVolume(ctx context.Context, nsID string, req model.VolumeCreateRequest) error
-	RenameVolume(ctx context.Context, nsID, oldLabel, newLabel string) error
 	ResizeVolume(ctx context.Context, nsID, label string, newTariffID string) error
 	GetVolume(ctx context.Context, nsID, label string) (kubeClientModel.Volume, error)
 	GetUserVolumes(ctx context.Context, filters ...string) ([]kubeClientModel.Volume, error)
@@ -48,14 +47,18 @@ func (s *Server) AdminCreateVolume(ctx context.Context, nsID string, req model.A
 			},
 			Capacity:    req.Capacity,
 			NamespaceID: nsID,
-			StorageID:   storage.ID,
+			StorageName: storage.Name,
 		}
 
 		if createErr := tx.CreateVolume(ctx, &volume); createErr != nil {
 			return createErr
 		}
 
-		// TODO: create it actually
+		kubeVol := volume.ToKube()
+
+		if createErr := s.clients.KubeAPI.CreateVolume(ctx, nsID, &kubeVol); createErr != nil {
+			return createErr
+		}
 
 		return nil
 	})
@@ -94,14 +97,18 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 			},
 			Capacity:    tariff.StorageLimit,
 			NamespaceID: nsID,
-			StorageID:   storage.ID,
+			StorageName: storage.Name,
 		}
 
 		if createErr := tx.CreateVolume(ctx, &volume); createErr != nil {
 			return createErr
 		}
 
-		// TODO: create it actually
+		kubeVol := volume.ToKube()
+
+		if createErr := s.clients.KubeAPI.CreateVolume(ctx, nsID, &kubeVol); createErr != nil {
+			return createErr
+		}
 
 		subReq := billing.SubscribeTariffRequest{
 			TariffID:      tariff.ID,
@@ -209,7 +216,9 @@ func (s *Server) DeleteVolume(ctx context.Context, nsID, label string) error {
 			return delErr
 		}
 
-		// TODO: actually delete it
+		if createErr := s.clients.KubeAPI.DeleteVolume(ctx, nsID, vol.Label); createErr != nil {
+			return createErr
+		}
 
 		if unsubErr := s.clients.Billing.Unsubscribe(ctx, vol.ID); unsubErr != nil {
 			return unsubErr
@@ -235,47 +244,12 @@ func (s *Server) DeleteAllUserVolumes(ctx context.Context) error {
 			return delErr
 		}
 
-		// TODO: actually delete it
-
 		var resourceIDs []string
 		for _, v := range vols {
 			resourceIDs = append(resourceIDs, v.ID)
 		}
 		if unsubErr := s.clients.Billing.MassiveUnsubscribe(ctx, resourceIDs); unsubErr != nil {
 			return unsubErr
-		}
-
-		return nil
-	})
-
-	return err
-}
-
-func (s *Server) RenameVolume(ctx context.Context, nsID, oldLabel, newLabel string) error {
-	userID := httputil.MustGetUserID(ctx)
-	s.log.WithFields(logrus.Fields{
-		"user_id":   userID,
-		"ns_id":     nsID,
-		"old_label": oldLabel,
-		"new_label": newLabel,
-	}).Infof("rename volume")
-
-	err := s.db.Transactional(func(tx database.DB) error {
-		vol, getErr := tx.VolumeByLabel(ctx, nsID, oldLabel)
-		if getErr != nil {
-			return getErr
-		}
-
-		vol.Label = newLabel
-
-		if renErr := tx.UpdateVolume(ctx, &vol); renErr != nil {
-			return renErr
-		}
-
-		// TODO: rename it actually
-
-		if renErr := s.clients.Billing.Rename(ctx, vol.ID, newLabel); renErr != nil {
-			return renErr
 		}
 
 		return nil
@@ -315,7 +289,11 @@ func (s *Server) ResizeVolume(ctx context.Context, nsID, label string, newTariff
 			return resizeErr
 		}
 
-		// TODO: resize it actually
+		kubeVol := vol.ToKube()
+
+		if createErr := s.clients.KubeAPI.UpdateVolume(ctx, nsID, &kubeVol); createErr != nil {
+			return createErr
+		}
 
 		return nil
 	})
