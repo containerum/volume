@@ -14,10 +14,10 @@ func init() {
 
 		if _, err := db.Model(&model.Volume{}).Exec( /* language=sql*/
 			`ALTER TABLE "?TableName" 
-				  		ADD CONSTRAINT storage_fk FOREIGN KEY (storage_id)
-				  		REFERENCES storages (id)
+				  		ADD CONSTRAINT storage_fk FOREIGN KEY (storage_name)
+				  		REFERENCES storages ("name")
 				  		ON UPDATE CASCADE
-				  		ON DELETE CASCADE
+				  		ON DELETE NO ACTION
 				  		DEFERRABLE
 				  		INITIALLY DEFERRED`); err != nil {
 			return err

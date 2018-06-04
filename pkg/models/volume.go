@@ -5,7 +5,6 @@ import (
 
 	"git.containerum.net/ch/volume-manager/pkg/errors"
 	"github.com/containerum/kube-client/pkg/model"
-	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 )
 
@@ -22,10 +21,7 @@ type Volume struct {
 	// swagger:strfmt uuid
 	NamespaceID string `sql:"ns_id,type:uuid" json:"namespace_id,omitempty"`
 
-	// swagger:strfmt uuid
-	StorageID string `sql:"storage_id,type:uuid,notnull" json:"storage_id,omitempty"`
-
-	StorageName string `sql:"-" json:"storage_name,omitempty"`
+	StorageName string `sql:"storage_name" json:"storage_name,omitempty"`
 
 	AccessMode model.PersistentVolumeAccessMode `sql:"access_mode,notnull" json:"access_mode,omitempty"`
 }
@@ -44,7 +40,7 @@ func (v *Volume) BeforeInsert(db orm.DB) error {
 		return errors.ErrResourceAlreadyExists().AddDetailF("volume %s already exists", v.Label)
 	}
 
-	_, err = db.Model(&Storage{ID: v.StorageID}).
+	_, err = db.Model(&Storage{Name: v.StorageName}).
 		WherePK().
 		Set("used = used + (?)", v.Capacity).
 		Update()
@@ -55,25 +51,18 @@ func (v *Volume) BeforeInsert(db orm.DB) error {
 func (v *Volume) AfterUpdate(db orm.DB) error {
 	var err error
 	if v.Deleted {
-		_, err = db.Model(&Storage{ID: v.StorageID}).
+		_, err = db.Model(&Storage{Name: v.StorageName}).
 			WherePK().
 			Set("used = used - ?", v.Capacity).
 			Update()
 	} else {
 		oldCapacityQuery := db.Model(v).Column("capacity").WherePK()
-		_, err = db.Model(&Storage{ID: v.StorageID}).
+		_, err = db.Model(&Storage{Name: v.StorageName}).
 			WherePK().
 			Set("used = used - (?) + ?", oldCapacityQuery, v.Capacity).
 			Update(v)
 	}
 	return err
-}
-
-func (v *Volume) AfterSelect(db orm.DB) error {
-	return db.Model(&Storage{ID: v.StorageID}).
-		Column("name").
-		WherePK().
-		Select(pg.Scan(&v.StorageName))
 }
 
 func (v *Volume) ToKube() model.Volume {
@@ -99,8 +88,7 @@ func (v *Volume) ToKube() model.Volume {
 
 func (v *Volume) Mask() {
 	v.Resource.Mask()
-	v.NamespaceID = ""
-	v.StorageID = ""
+	v.StorageName = ""
 	v.AccessMode = ""
 }
 

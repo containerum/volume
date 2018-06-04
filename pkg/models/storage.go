@@ -11,10 +11,7 @@ import (
 type Storage struct {
 	tableName struct{} `sql:"storages"`
 
-	// swagger:strfmt uuid
-	ID string `sql:"id,pk,type:uuid,default:uuid_generate_v4()" json:"id,omitempty"`
-
-	Name string `sql:"name,notnull,unique" json:"name" binding:"required"`
+	Name string `sql:"name,pk,notnull" json:"name" binding:"required"`
 
 	Size int `sql:"size,notnull" json:"size" binding:"gt=0"`
 
@@ -36,14 +33,14 @@ func (s *Storage) BeforeInsert(db orm.DB) error {
 
 func (s *Storage) BeforeUpdate(db orm.DB) error {
 	if s.Size < s.Used {
-		return errors.ErrQuotaExceeded().AddDetailF("storage quota exceeded (%d GiB)", s.Used - s.Size)
+		return errors.ErrQuotaExceeded().AddDetailF("storage quota exceeded (%d GiB)", s.Used-s.Size)
 	}
 	return nil
 }
 
 func (s *Storage) BeforeDelete(db orm.DB) error {
-	cnt, err := db.Model(&Volume{StorageID: s.ID}).
-		Where("storage_id = ?storage_id").
+	cnt, err := db.Model(&Volume{StorageName: s.Name}).
+		WherePK().
 		Where("NOT deleted").
 		Count()
 	if err != nil {
@@ -59,7 +56,7 @@ func (s *Storage) BeforeDelete(db orm.DB) error {
 //
 // swagger:model
 type UpdateStorageRequest struct {
-	Name     *string  `json:"name,omitempty"`
-	Size     *int     `json:"size,omitempty" binding:"omitempty,gt=0,gtecsfield=Used"`
-	Used     *int     `json:"size,omitempty"`
+	Name *string `json:"name,omitempty"`
+	Size *int    `json:"size,omitempty" binding:"omitempty,gt=0,gtecsfield=Used"`
+	Used *int    `json:"size,omitempty"`
 }

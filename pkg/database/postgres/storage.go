@@ -11,7 +11,6 @@ import (
 func (pgdb *PgDB) CreateStorage(ctx context.Context, storage *model.Storage) error {
 	pgdb.log.Debugf("create storage %+v", storage)
 
-	storage.ID = ""
 	storage.Used = 0
 	_, err := pgdb.db.Model(storage).
 		Returning("*").
