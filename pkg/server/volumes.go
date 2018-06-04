@@ -4,8 +4,10 @@ import (
 	"context"
 
 	"git.containerum.net/ch/volume-manager/pkg/database"
+	"git.containerum.net/ch/volume-manager/pkg/errors"
 	"git.containerum.net/ch/volume-manager/pkg/models"
 	billing "github.com/containerum/bill-external/models"
+	"github.com/containerum/cherry"
 	kubeClientModel "github.com/containerum/kube-client/pkg/model"
 	"github.com/containerum/utils/httputil"
 	"github.com/sirupsen/logrus"
@@ -230,7 +232,12 @@ func (s *Server) DeleteAllUserVolumes(ctx context.Context) error {
 
 	err := s.db.Transactional(func(tx database.DB) error {
 		vols, err := s.db.UserVolumes(ctx, userID)
-		if err != nil {
+		switch {
+		case err == nil:
+			// pass
+		case cherry.Equals(err, errors.ErrResourceNotExists()):
+			return nil
+		default:
 			return err
 		}
 
@@ -261,7 +268,12 @@ func (s *Server) DeleteAllNamespaceVolumes(ctx context.Context, nsID string) err
 
 	err := s.db.Transactional(func(tx database.DB) error {
 		vols, err := s.db.NamespaceVolumes(ctx, nsID)
-		if err != nil {
+		switch {
+		case err == nil:
+			// pass
+		case cherry.Equals(err, errors.ErrResourceNotExists()):
+			return nil
+		default:
 			return err
 		}
 
