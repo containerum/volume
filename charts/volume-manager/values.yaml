@@ -24,7 +24,7 @@ env:
     DB_BASE: "volume-manager"
     LISTEN_ADDR: ":4343"
   local:
-    DB_HOST: "postgres:5432"
+    DB_HOST: "postgres-master.postgres.svc.cluster.local:5432"
     KUBE_API_ADDR: "kube-api:1214"
     BILLING_ADDR: "billing-manager:5000"
     DB_PASSWORD:
