@@ -16,7 +16,8 @@ ENV MODE="release" \
     DB_SSLMODE="false" \
     DB_BASE="volume-manager" \
     LISTEN_ADDR=":4343" \
-    BILLING_ADDR="billing-manager:5000"
+    BILLING_ADDR="billing-manager:5000" \
+    KUBE_API_ADDR="kube-api:1214"
 
 EXPOSE 4343
 
