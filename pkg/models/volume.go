@@ -117,3 +117,10 @@ type VolumeResizeRequest struct {
 	// swagger:strfmt uuid
 	TariffID string `json:"tariff_id" binding:"required,uuid"`
 }
+
+// AdminVolumeResizeRequest contains parameters for changing volume size as admin
+//
+// swagger:model
+type AdminVolumeResizeRequest struct {
+	Capacity int `json:"capacity" binding:"gt=0"`
+}
