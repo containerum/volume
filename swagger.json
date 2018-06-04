@@ -51,6 +51,45 @@
         }
       }
     },
+    "/admin/namespaces/{ns_id}/volumes/{label}": {
+      "put": {
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "Resize volume (admins only).",
+        "operationId": "AdminResizeVolume",
+        "parameters": [
+          {
+            "$ref": "#/parameters/UserIDHeader"
+          },
+          {
+            "$ref": "#/parameters/UserRoleHeader"
+          },
+          {
+            "$ref": "#/parameters/SubstitutedUserID"
+          },
+          {
+            "$ref": "#/parameters/NamespaceID"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AdminVolumeResizeRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "volume resized"
+          },
+          "default": {
+            "$ref": "#/responses/error"
+          }
+        }
+      }
+    },
     "/admin/volumes": {
       "get": {
         "tags": [
@@ -449,6 +488,18 @@
         "label": {
           "type": "string",
           "x-go-name": "Label"
+        }
+      },
+      "x-go-package": "git.containerum.net/ch/volume-manager/pkg/models"
+    },
+    "AdminVolumeResizeRequest": {
+      "description": "AdminVolumeResizeRequest contains parameters for changing volume size as admin",
+      "type": "object",
+      "properties": {
+        "capacity": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Capacity"
         }
       },
       "x-go-package": "git.containerum.net/ch/volume-manager/pkg/models"
@@ -1842,48 +1893,35 @@
       "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
     },
     "Volume": {
-      "description": "Volume describes volume",
+      "description": "Volume -- volume representation",
       "type": "object",
       "properties": {
+        "access": {
+          "$ref": "#/definitions/AccessLevel"
+        },
         "access_mode": {
           "$ref": "#/definitions/PersistentVolumeAccessMode"
         },
         "capacity": {
           "type": "integer",
-          "format": "int64",
+          "format": "uint64",
           "x-go-name": "Capacity"
         },
-        "create_time": {
+        "created_at": {
           "type": "string",
-          "format": "date-time",
-          "x-go-name": "CreateTime"
+          "x-go-name": "CreatedAt"
         },
-        "delete_time": {
+        "name": {
           "type": "string",
-          "format": "date-time",
-          "x-go-name": "DeleteTime"
+          "x-go-name": "Name"
         },
-        "deleted": {
-          "type": "boolean",
-          "x-go-name": "Deleted"
-        },
-        "id": {
+        "owner": {
           "type": "string",
-          "format": "uuid",
-          "x-go-name": "ID"
+          "x-go-name": "Owner"
         },
-        "label": {
+        "owner_login": {
           "type": "string",
-          "x-go-name": "Label"
-        },
-        "namespace_id": {
-          "type": "string",
-          "format": "uuid",
-          "x-go-name": "NamespaceID"
-        },
-        "owner_user_id": {
-          "type": "string",
-          "x-go-name": "OwnerUserID"
+          "x-go-name": "OwnerLogin"
         },
         "storage_name": {
           "type": "string",
@@ -1891,11 +1929,17 @@
         },
         "tariff_id": {
           "type": "string",
-          "format": "uuid",
           "x-go-name": "TariffID"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserAccess"
+          },
+          "x-go-name": "Users"
         }
       },
-      "x-go-package": "git.containerum.net/ch/volume-manager/pkg/models"
+      "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
     },
     "VolumeCreateRequest": {
       "description": "VolumeCreateRequest is a request object for creating volume",

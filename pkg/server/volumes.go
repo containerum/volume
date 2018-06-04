@@ -14,6 +14,7 @@ import (
 type VolumeActions interface {
 	AdminCreateVolume(ctx context.Context, nsID string, req model.AdminVolumeCreateRequest) error
 	CreateVolume(ctx context.Context, nsID string, req model.VolumeCreateRequest) error
+	AdminResizeVolume(ctx context.Context, nsID, label string, newCapacity int) error
 	ResizeVolume(ctx context.Context, nsID, label string, newTariffID string) error
 	GetVolume(ctx context.Context, nsID, label string) (kubeClientModel.Volume, error)
 	GetUserVolumes(ctx context.Context) ([]kubeClientModel.Volume, error)
@@ -274,6 +275,40 @@ func (s *Server) DeleteAllNamespaceVolumes(ctx context.Context, nsID string) err
 		}
 		if unsubErr := s.clients.Billing.MassiveUnsubscribe(ctx, resourceIDs); unsubErr != nil {
 			return unsubErr
+		}
+
+		return nil
+	})
+
+	return err
+}
+
+func (s *Server) AdminResizeVolume(ctx context.Context, nsID, label string, newCapacity int) error {
+	userID := httputil.MustGetUserID(ctx)
+	s.log.WithFields(logrus.Fields{
+		"user_id":      userID,
+		"ns_id":        nsID,
+		"label":        label,
+		"new_capacity": newCapacity,
+	}).Infof("resize volume")
+
+	err := s.db.Transactional(func(tx database.DB) error {
+		vol, getErr := tx.VolumeByLabel(ctx, nsID, label)
+		if getErr != nil {
+			return getErr
+		}
+
+		vol.TariffID = nil
+		vol.Capacity = newCapacity
+
+		if resizeErr := tx.UpdateVolume(ctx, &vol); resizeErr != nil {
+			return resizeErr
+		}
+
+		kubeVol := vol.ToKube()
+
+		if createErr := s.clients.KubeAPI.UpdateVolume(ctx, nsID, &kubeVol); createErr != nil {
+			return createErr
 		}
 
 		return nil

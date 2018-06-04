@@ -21,7 +21,7 @@ type Volume struct {
 	// swagger:strfmt uuid
 	NamespaceID string `sql:"ns_id,type:uuid" json:"namespace_id,omitempty"`
 
-	StorageName string `sql:"storage_name" json:"storage_name,omitempty"`
+	StorageName string `sql:"storage_name,notnull" json:"storage_name,omitempty"`
 
 	AccessMode model.PersistentVolumeAccessMode `sql:"access_mode,notnull" json:"access_mode,omitempty"`
 }
@@ -116,4 +116,11 @@ type VolumeRenameRequest = model.ResourceUpdateName
 type VolumeResizeRequest struct {
 	// swagger:strfmt uuid
 	TariffID string `json:"tariff_id" binding:"required,uuid"`
+}
+
+// AdminVolumeResizeRequest contains parameters for changing volume size as admin
+//
+// swagger:model
+type AdminVolumeResizeRequest struct {
+	Capacity int `json:"capacity" binding:"gt=0"`
 }

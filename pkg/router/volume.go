@@ -129,8 +129,25 @@ func (vh *volumeHandlers) resizeVolumeHandler(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
+func (vh *volumeHandlers) adminResizeVolumeHandler(ctx *gin.Context) {
+	var req model.AdminVolumeResizeRequest
+	if err := ctx.ShouldBindWith(&req, binding.JSON); err != nil {
+		ctx.AbortWithStatusJSON(vh.tv.BadRequest(ctx, err))
+		return
+	}
+	if err := vh.acts.AdminResizeVolume(ctx.Request.Context(), ctx.Param("ns_id"), ctx.Param("label"), req.Capacity); err != nil {
+		ctx.AbortWithStatusJSON(vh.tv.HandleError(err))
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
 func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	handlers := &volumeHandlers{tv: r.tv, acts: acts}
+
+	group := r.engine.Group("/namespaces/:ns_id/volumes")
+	adminGroup := r.engine.Group("/admin/namespaces/:ns_id/volumes", httputil.RequireAdminRole(errors.ErrAdminRequired))
 
 	// swagger:operation POST /admin/namespaces/{ns_id}/volumes Volumes AdminCreateVolume
 	//
@@ -153,9 +170,7 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//     description: volume created
 	//   default:
 	//     $ref: '#/responses/error'
-	r.engine.POST("/admin/namespaces/:ns_id/volumes", httputil.RequireAdminRole(errors.ErrAdminRequired), handlers.adminCreateVolumeHandler)
-
-	group := r.engine.Group("/namespaces/:ns_id/volumes")
+	adminGroup.POST("/", handlers.adminCreateVolumeHandler)
 
 	// swagger:operation POST /namespaces/{ns_id}/volumes Volumes CreateVolume
 	//
@@ -314,4 +329,26 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//   default:
 	//     $ref: '#/responses/error'
 	group.PUT("/:label", handlers.resizeVolumeHandler)
+
+	// swagger:operation PUT /admin/namespaces/{ns_id}/volumes/{label} Volumes AdminResizeVolume
+	//
+	// Resize volume (admins only).
+	//
+	// ---
+	// parameters:
+	//  - $ref: '#/parameters/UserIDHeader'
+	//  - $ref: '#/parameters/UserRoleHeader'
+	//  - $ref: '#/parameters/SubstitutedUserID'
+	//  - $ref: '#/parameters/NamespaceID'
+	//  - name: body
+	//    in: body
+	//    required: true
+	//    schema:
+	//      $ref: '#/definitions/AdminVolumeResizeRequest'
+	// responses:
+	//   '200':
+	//     description: volume resized
+	//   default:
+	//     $ref: '#/responses/error'
+	adminGroup.PUT("/:label", handlers.adminResizeVolumeHandler)
 }
