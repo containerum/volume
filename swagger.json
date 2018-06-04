@@ -11,46 +11,6 @@
     "title": "Volume-Manager API"
   },
   "paths": {
-    "/admin/namespaces/{ns_id}/volumes": {
-      "post": {
-        "description": "Should be chosen first storage, where free space allows to create volume with provided capacity.",
-        "tags": [
-          "Volumes"
-        ],
-        "summary": "Create volume for admin using only capacity.",
-        "operationId": "AdminCreateVolume",
-        "parameters": [
-          {
-            "$ref": "#/parameters/UserIDHeader"
-          },
-          {
-            "$ref": "#/parameters/UserRoleHeader"
-          },
-          {
-            "$ref": "#/parameters/SubstitutedUserID"
-          },
-          {
-            "$ref": "#/parameters/NamespaceID"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/AdminVolumeCreateRequest"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "volume created"
-          },
-          "default": {
-            "$ref": "#/responses/error"
-          }
-        }
-      }
-    },
     "/admin/namespaces/{ns_id}/volumes/{label}": {
       "put": {
         "tags": [
@@ -152,6 +112,46 @@
         "responses": {
           "200": {
             "description": "volumes deleted"
+          },
+          "default": {
+            "$ref": "#/responses/error"
+          }
+        }
+      }
+    },
+    "/limits/namespaces/{ns_id}/volumes": {
+      "post": {
+        "description": "Should be chosen first storage, where free space allows to create volume with provided capacity.",
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "Create Volume using only capacity.",
+        "operationId": "DirectCreateVolume",
+        "parameters": [
+          {
+            "$ref": "#/parameters/UserIDHeader"
+          },
+          {
+            "$ref": "#/parameters/UserRoleHeader"
+          },
+          {
+            "$ref": "#/parameters/SubstitutedUserID"
+          },
+          {
+            "$ref": "#/parameters/NamespaceID"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DirectVolumeCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "volume created"
           },
           "default": {
             "$ref": "#/responses/error"
@@ -475,22 +475,6 @@
     "AccessLevel": {
       "type": "string",
       "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
-    },
-    "AdminVolumeCreateRequest": {
-      "description": "AdminVolumeCreateRequest is a request object for creating volume as admin (without billing)",
-      "type": "object",
-      "properties": {
-        "capacity": {
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "Capacity"
-        },
-        "label": {
-          "type": "string",
-          "x-go-name": "Label"
-        }
-      },
-      "x-go-package": "git.containerum.net/ch/volume-manager/pkg/models"
     },
     "AdminVolumeResizeRequest": {
       "description": "AdminVolumeResizeRequest contains parameters for changing volume size as admin",
@@ -866,6 +850,22 @@
         }
       },
       "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
+    },
+    "DirectVolumeCreateRequest": {
+      "description": "DirectVolumeCreateRequest is a request object for creating volume as admin (without billing)",
+      "type": "object",
+      "properties": {
+        "capacity": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Capacity"
+        },
+        "label": {
+          "type": "string",
+          "x-go-name": "Label"
+        }
+      },
+      "x-go-package": "git.containerum.net/ch/volume-manager/pkg/models"
     },
     "Env": {
       "description": "Env -- key-value pair of environment variables",

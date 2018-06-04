@@ -97,10 +97,10 @@ func (v *Volume) Mask() {
 // swagger:model
 type VolumeCreateRequest = model.CreateVolume
 
-// AdminVolumeCreateRequest is a request object for creating volume as admin (without billing)
+// DirectVolumeCreateRequest is a request object for creating volume as admin (without billing)
 //
 // swagger:model
-type AdminVolumeCreateRequest struct {
+type DirectVolumeCreateRequest struct {
 	Label    string `json:"label" binding:"required"`
 	Capacity int    `json:"capacity" binding:"gt=0"`
 }

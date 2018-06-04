@@ -14,7 +14,7 @@ import (
 )
 
 type VolumeActions interface {
-	AdminCreateVolume(ctx context.Context, nsID string, req model.AdminVolumeCreateRequest) error
+	DirectCreateVolume(ctx context.Context, nsID string, req model.DirectVolumeCreateRequest) error
 	CreateVolume(ctx context.Context, nsID string, req model.VolumeCreateRequest) error
 	AdminResizeVolume(ctx context.Context, nsID, label string, newCapacity int) error
 	ResizeVolume(ctx context.Context, nsID, label string, newTariffID string) error
@@ -30,7 +30,7 @@ var StandardVolumeFilter = database.VolumeFilter{
 	NotDeleted: true,
 }
 
-func (s *Server) AdminCreateVolume(ctx context.Context, nsID string, req model.AdminVolumeCreateRequest) error {
+func (s *Server) DirectCreateVolume(ctx context.Context, nsID string, req model.DirectVolumeCreateRequest) error {
 	userID := httputil.MustGetUserID(ctx)
 	s.log.WithFields(logrus.Fields{
 		"ns_id":    nsID,
