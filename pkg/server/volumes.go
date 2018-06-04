@@ -16,7 +16,7 @@ type VolumeActions interface {
 	CreateVolume(ctx context.Context, nsID string, req model.VolumeCreateRequest) error
 	ResizeVolume(ctx context.Context, nsID, label string, newTariffID string) error
 	GetVolume(ctx context.Context, nsID, label string) (kubeClientModel.Volume, error)
-	GetUserVolumes(ctx context.Context, filters ...string) ([]kubeClientModel.Volume, error)
+	GetUserVolumes(ctx context.Context) ([]kubeClientModel.Volume, error)
 	GetAllVolumes(ctx context.Context, page, perPage int, filters ...string) ([]kubeClientModel.Volume, error)
 	DeleteVolume(ctx context.Context, nsID, label string) error
 	DeleteAllUserVolumes(ctx context.Context) error
@@ -43,7 +43,8 @@ func (s *Server) AdminCreateVolume(ctx context.Context, nsID string, req model.A
 
 		volume := model.Volume{
 			Resource: model.Resource{
-				Label: req.Label,
+				Label:       req.Label,
+				OwnerUserID: userID,
 			},
 			Capacity:    req.Capacity,
 			NamespaceID: nsID,
@@ -92,8 +93,9 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 
 		volume := model.Volume{
 			Resource: model.Resource{
-				TariffID: &tariff.ID,
-				Label:    req.Label,
+				TariffID:    &tariff.ID,
+				Label:       req.Label,
+				OwnerUserID: userID,
 			},
 			Capacity:    tariff.StorageLimit,
 			NamespaceID: nsID,
@@ -142,21 +144,11 @@ func (s *Server) GetVolume(ctx context.Context, nsID, label string) (kubeClientM
 	return vol.ToKube(), nil
 }
 
-func (s *Server) GetUserVolumes(ctx context.Context, filters ...string) ([]kubeClientModel.Volume, error) {
+func (s *Server) GetUserVolumes(ctx context.Context) ([]kubeClientModel.Volume, error) {
 	userID := httputil.MustGetUserID(ctx)
-	s.log.WithFields(logrus.Fields{
-		"user_id": userID,
-		"filters": filters,
-	}).Infof("get user volumes")
+	s.log.WithField("user_id", userID).Infof("get user volumes")
 
-	var filter database.VolumeFilter
-	if IsAdminRole(ctx) {
-		filter = database.ParseVolumeFilter(filters...)
-	} else {
-		filter = StandardVolumeFilter
-	}
-
-	vols, err := s.db.VolumesByIDs(ctx, nil /* TODO */, filter)
+	vols, err := s.db.UserVolumes(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -235,7 +227,7 @@ func (s *Server) DeleteAllUserVolumes(ctx context.Context) error {
 	s.log.WithField("user_id", userID).Infof("delete all user volumes")
 
 	err := s.db.Transactional(func(tx database.DB) error {
-		vols, err := s.db.VolumesByIDs(ctx, nil /* TODO */, StandardVolumeFilter)
+		vols, err := s.db.UserVolumes(ctx, userID)
 		if err != nil {
 			return err
 		}

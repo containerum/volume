@@ -58,7 +58,7 @@ func (vh *volumeHandlers) getVolumeHandler(ctx *gin.Context) {
 }
 
 func (vh *volumeHandlers) getUserVolumesHandler(ctx *gin.Context) {
-	ret, err := vh.acts.GetUserVolumes(ctx.Request.Context(), getFilters(ctx.Request.URL.Query())...)
+	ret, err := vh.acts.GetUserVolumes(ctx.Request.Context())
 
 	if err != nil {
 		ctx.AbortWithStatusJSON(vh.tv.HandleError(err))
@@ -199,7 +199,6 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//  - $ref: '#/parameters/UserIDHeader'
 	//  - $ref: '#/parameters/UserRoleHeader'
 	//  - $ref: '#/parameters/SubstitutedUserID'
-	//  - $ref: '#/parameters/Filters'
 	//  - $ref: '#/parameters/NamespaceID'
 	// responses:
 	//   '200':

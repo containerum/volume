@@ -16,7 +16,8 @@ type DB interface {
 	DeleteStorage(ctx context.Context, storage *model.Storage) error
 
 	VolumeByLabel(ctx context.Context, nsID string, label string) (model.Volume, error)
-	VolumesByIDs(ctx context.Context, ids []string, filter VolumeFilter) ([]model.Volume, error)
+	UserVolumes(ctx context.Context, userID string) ([]model.Volume, error)
+	NamespaceVolumes(ctx context.Context, nsID string) ([]model.Volume, error)
 	AllVolumes(ctx context.Context, filter VolumeFilter) ([]model.Volume, error)
 	CreateVolume(ctx context.Context, volume *model.Volume) error
 	DeleteVolume(ctx context.Context, volume *model.Volume) error
