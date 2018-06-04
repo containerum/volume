@@ -258,45 +258,6 @@
         }
       }
     },
-    "/namespaces/{ns_id}/volumes/{label}/rename": {
-      "put": {
-        "tags": [
-          "Volumes"
-        ],
-        "summary": "Rename volume.",
-        "operationId": "RenameVolume",
-        "parameters": [
-          {
-            "$ref": "#/parameters/UserIDHeader"
-          },
-          {
-            "$ref": "#/parameters/UserRoleHeader"
-          },
-          {
-            "$ref": "#/parameters/SubstitutedUserID"
-          },
-          {
-            "$ref": "#/parameters/NamespaceID"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/VolumeRenameRequest"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "volume renamed"
-          },
-          "default": {
-            "$ref": "#/responses/error"
-          }
-        }
-      }
-    },
     "/storages": {
       "get": {
         "tags": [
@@ -1528,11 +1489,6 @@
       "description": "Storage describes volumes storage",
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid",
-          "x-go-name": "ID"
-        },
         "name": {
           "type": "string",
           "x-go-name": "Name"
