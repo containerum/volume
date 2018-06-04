@@ -11,6 +11,46 @@
     "title": "Volume-Manager API"
   },
   "paths": {
+    "/admin/namespaces/{ns_id}/volumes": {
+      "post": {
+        "description": "Should be chosen first storage, where free space allows to create volume with provided capacity.",
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "Create volume for admin using only capacity.",
+        "operationId": "AdminCreateVolume",
+        "parameters": [
+          {
+            "$ref": "#/parameters/UserIDHeader"
+          },
+          {
+            "$ref": "#/parameters/UserRoleHeader"
+          },
+          {
+            "$ref": "#/parameters/SubstitutedUserID"
+          },
+          {
+            "$ref": "#/parameters/NamespaceID"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AdminVolumeCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "volume created"
+          },
+          "default": {
+            "$ref": "#/responses/error"
+          }
+        }
+      }
+    },
     "/admin/volumes": {
       "get": {
         "tags": [

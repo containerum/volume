@@ -17,6 +17,20 @@ type volumeHandlers struct {
 	acts server.VolumeActions
 }
 
+func (vh *volumeHandlers) adminCreateVolumeHandler(ctx *gin.Context) {
+	var req model.AdminVolumeCreateRequest
+	if err := ctx.ShouldBindWith(&req, binding.JSON); err != nil {
+		ctx.AbortWithStatusJSON(vh.tv.BadRequest(ctx, err))
+		return
+	}
+	if err := vh.acts.AdminCreateVolume(ctx.Request.Context(), ctx.Param("ns_id"), req); err != nil {
+		ctx.AbortWithStatusJSON(vh.tv.HandleError(err))
+		return
+	}
+
+	ctx.Status(http.StatusCreated)
+}
+
 func (vh *volumeHandlers) createVolumeHandler(ctx *gin.Context) {
 	var req model.VolumeCreateRequest
 	if err := ctx.ShouldBindWith(&req, binding.JSON); err != nil {
@@ -108,6 +122,29 @@ func (vh *volumeHandlers) resizeVolumeHandler(ctx *gin.Context) {
 
 func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	handlers := &volumeHandlers{tv: r.tv, acts: acts}
+
+	// swagger:operation POST /admin/namespaces/{ns_id}/volumes Volumes AdminCreateVolume
+	//
+	// Create volume for admin using only capacity.
+	// Should be chosen first storage, where free space allows to create volume with provided capacity.
+	//
+	// ---
+	// parameters:
+	//  - $ref: '#/parameters/UserIDHeader'
+	//  - $ref: '#/parameters/UserRoleHeader'
+	//  - $ref: '#/parameters/SubstitutedUserID'
+	//  - $ref: '#/parameters/NamespaceID'
+	//  - name: body
+	//    in: body
+	//    required: true
+	//    schema:
+	//      $ref: '#/definitions/AdminVolumeCreateRequest'
+	// responses:
+	//   '201':
+	//     description: volume created
+	//   default:
+	//     $ref: '#/responses/error'
+	r.engine.POST("/admin/namespaces/:ns_id/volumes", httputil.RequireAdminRole(errors.ErrAdminRequired), handlers.adminCreateVolumeHandler)
 
 	group := r.engine.Group("/namespaces/:ns_id/volumes")
 
@@ -251,5 +288,5 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//     description: volume resized
 	//   default:
 	//     $ref: '#/responses/error'
-	r.engine.PUT("/volumes/:label", handlers.resizeVolumeHandler)
+	group.PUT("/:label", handlers.resizeVolumeHandler)
 }
