@@ -58,7 +58,7 @@ func (vh *volumeHandlers) getVolumeHandler(ctx *gin.Context) {
 }
 
 func (vh *volumeHandlers) getUserVolumesHandler(ctx *gin.Context) {
-	ret, err := vh.acts.GetUserVolumes(ctx.Request.Context(), getFilters(ctx.Request.URL.Query())...)
+	ret, err := vh.acts.GetUserVolumes(ctx.Request.Context())
 
 	if err != nil {
 		ctx.AbortWithStatusJSON(vh.tv.HandleError(err))
@@ -99,6 +99,15 @@ func (vh *volumeHandlers) deleteVolumeHandler(ctx *gin.Context) {
 
 func (vh *volumeHandlers) deleteAllUserVolumesHandler(ctx *gin.Context) {
 	if err := vh.acts.DeleteAllUserVolumes(ctx.Request.Context()); err != nil {
+		ctx.AbortWithStatusJSON(vh.tv.HandleError(err))
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+func (vh *volumeHandlers) deleteAllNamespaceVolumesHandler(ctx *gin.Context) {
+	if err := vh.acts.DeleteAllNamespaceVolumes(ctx.Request.Context(), ctx.Param("ns_id")); err != nil {
 		ctx.AbortWithStatusJSON(vh.tv.HandleError(err))
 		return
 	}
@@ -199,7 +208,6 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//  - $ref: '#/parameters/UserIDHeader'
 	//  - $ref: '#/parameters/UserRoleHeader'
 	//  - $ref: '#/parameters/SubstitutedUserID'
-	//  - $ref: '#/parameters/Filters'
 	//  - $ref: '#/parameters/NamespaceID'
 	// responses:
 	//   '200':
@@ -252,9 +260,26 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//     $ref: '#/responses/error'
 	group.DELETE("/:label", handlers.deleteVolumeHandler)
 
+	// swagger:operation GET /namespaces/{ns_id}/volumes Volumes DeleteAllNamespaceVolumes
+	//
+	// Delete all namespace volumes.
+	//
+	// ---
+	// parameters:
+	//  - $ref: '#/parameters/UserIDHeader'
+	//  - $ref: '#/parameters/UserRoleHeader'
+	//  - $ref: '#/parameters/SubstitutedUserID'
+	//  - $ref: '#/parameters/NamespaceID'
+	// responses:
+	//   '200':
+	//     description: volumes deleted
+	//   default:
+	//     $ref: '#/responses/error'
+	group.DELETE("/", handlers.deleteAllNamespaceVolumesHandler)
+
 	// swagger:operation DELETE /admin/volumes Volumes DeleteAllUserVolumes
 	//
-	// Delete all user volumes (admin only).
+	// Delete all user volumes.
 	//
 	// ---
 	// parameters:
@@ -266,7 +291,7 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//     description: volumes deleted
 	//   default:
 	//     $ref: '#/responses/error'
-	r.engine.DELETE("/admin/volumes", httputil.RequireAdminRole(errors.ErrAdminRequired), handlers.deleteAllUserVolumesHandler)
+	r.engine.DELETE("/volumes", handlers.deleteAllUserVolumesHandler)
 
 	// swagger:operation PUT /namespaces/{ns_id}/volumes/{label} Volumes ResizeVolume
 	//

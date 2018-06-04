@@ -33,18 +33,31 @@ func (pgdb *PgDB) VolumeByLabel(ctx context.Context, nsID, label string) (ret mo
 	return
 }
 
-func (pgdb *PgDB) VolumesByIDs(ctx context.Context, ids []string, filter database.VolumeFilter) (ret []model.Volume, err error) {
-	pgdb.log.WithFields(logrus.Fields{
-		"ids":     ids,
-		"filters": filter,
-	}).Debugf("get volumes by ids")
+func (pgdb *PgDB) UserVolumes(ctx context.Context, userID string) (ret []model.Volume, err error) {
+	pgdb.log.WithField("user_id", userID).Debugf("get all user volumes")
 
 	ret = make([]model.Volume, 0)
 
-	f := VolumeFilter(filter)
 	err = pgdb.db.Model(&ret).
-		Where("id IN (?)", ids).
-		Apply(f.Filter).
+		Where("owner_user_id = ?", userID).
+		Select()
+	switch err {
+	case pg.ErrNoRows:
+		err = errors.ErrResourceNotExists().AddDetailF("no volumes found")
+	default:
+		err = pgdb.handleError(err)
+	}
+
+	return
+}
+
+func (pgdb *PgDB) NamespaceVolumes(ctx context.Context, nsID string) (ret []model.Volume, err error) {
+	pgdb.log.WithField("namespace_id", nsID).Debugf("get namespace volumes")
+
+	ret = make([]model.Volume, 0)
+
+	err = pgdb.db.Model(&ret).
+		Where("ns_id = ?", nsID).
 		Select()
 	switch err {
 	case pg.ErrNoRows:
