@@ -97,7 +97,7 @@
         "tags": [
           "Volumes"
         ],
-        "summary": "Delete all user volumes (admin only).",
+        "summary": "Delete all user volumes.",
         "operationId": "DeleteAllUserVolumes",
         "parameters": [
           {
@@ -125,8 +125,8 @@
         "tags": [
           "Volumes"
         ],
-        "summary": "Get user volumes.",
-        "operationId": "GetUserVolumes",
+        "summary": "Delete all namespace volumes.",
+        "operationId": "DeleteAllNamespaceVolumes",
         "parameters": [
           {
             "$ref": "#/parameters/UserIDHeader"
@@ -138,21 +138,12 @@
             "$ref": "#/parameters/SubstitutedUserID"
           },
           {
-            "$ref": "#/parameters/Filters"
-          },
-          {
             "$ref": "#/parameters/NamespaceID"
           }
         ],
         "responses": {
           "200": {
-            "description": "volumes response",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Volume"
-              }
-            }
+            "description": "volumes deleted"
           },
           "default": {
             "$ref": "#/responses/error"
@@ -1889,6 +1880,10 @@
           "type": "string",
           "format": "uuid",
           "x-go-name": "NamespaceID"
+        },
+        "owner_user_id": {
+          "type": "string",
+          "x-go-name": "OwnerUserID"
         },
         "storage_name": {
           "type": "string",
