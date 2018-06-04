@@ -19,6 +19,7 @@ type VolumeActions interface {
 	GetUserVolumes(ctx context.Context) ([]kubeClientModel.Volume, error)
 	GetAllVolumes(ctx context.Context, page, perPage int, filters ...string) ([]kubeClientModel.Volume, error)
 	DeleteVolume(ctx context.Context, nsID, label string) error
+	DeleteAllNamespaceVolumes(ctx context.Context, nsID string) error
 	DeleteAllUserVolumes(ctx context.Context) error
 }
 
@@ -228,6 +229,37 @@ func (s *Server) DeleteAllUserVolumes(ctx context.Context) error {
 
 	err := s.db.Transactional(func(tx database.DB) error {
 		vols, err := s.db.UserVolumes(ctx, userID)
+		if err != nil {
+			return err
+		}
+
+		if delErr := tx.DeleteVolumes(ctx, vols); delErr != nil {
+			return delErr
+		}
+
+		var resourceIDs []string
+		for _, v := range vols {
+			resourceIDs = append(resourceIDs, v.ID)
+		}
+		if unsubErr := s.clients.Billing.MassiveUnsubscribe(ctx, resourceIDs); unsubErr != nil {
+			return unsubErr
+		}
+
+		return nil
+	})
+
+	return err
+}
+
+func (s *Server) DeleteAllNamespaceVolumes(ctx context.Context, nsID string) error {
+	userID := httputil.MustGetUserID(ctx)
+	s.log.WithFields(logrus.Fields{
+		"user_id":      userID,
+		"namespace_id": nsID,
+	}).Infof("delete all user volumes")
+
+	err := s.db.Transactional(func(tx database.DB) error {
+		vols, err := s.db.NamespaceVolumes(ctx, nsID)
 		if err != nil {
 			return err
 		}
