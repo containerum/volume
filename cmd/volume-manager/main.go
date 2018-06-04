@@ -69,6 +69,7 @@ func main() {
 			&DBSSLModeFlag,
 			&ListenAddrFlag,
 			&BillingAddrFlag,
+			&KubeAPIAddrFlag,
 			&CORSFlag,
 		},
 		Before: func(ctx *cli.Context) error {

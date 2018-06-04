@@ -13,6 +13,7 @@ import (
 
 type Clients struct {
 	Billing clients.BillingClient
+	KubeAPI clients.KubeAPIClient
 }
 
 func (c *Clients) Close() error {
