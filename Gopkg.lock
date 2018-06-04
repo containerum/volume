@@ -27,8 +27,8 @@
     ".",
     "pkg/model"
   ]
-  revision = "ea99fc8e4b53d482604ae1ea8ba7ff4a481a7bcb"
-  version = "v0.19.2"
+  revision = "f4426c78c32495020cc6f16c0a14367cb14444ad"
+  version = "v0.19.5"
 
 [[projects]]
   name = "github.com/containerum/utils"
