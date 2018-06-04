@@ -261,6 +261,43 @@
           }
         }
       },
+      "put": {
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "Resize volume.",
+        "operationId": "ResizeVolume",
+        "parameters": [
+          {
+            "$ref": "#/parameters/UserIDHeader"
+          },
+          {
+            "$ref": "#/parameters/UserRoleHeader"
+          },
+          {
+            "$ref": "#/parameters/SubstitutedUserID"
+          },
+          {
+            "$ref": "#/parameters/NamespaceID"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/VolumeResizeRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "volume resized"
+          },
+          "default": {
+            "$ref": "#/responses/error"
+          }
+        }
+      },
       "delete": {
         "tags": [
           "Volumes"
