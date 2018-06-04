@@ -19,9 +19,9 @@ env:
   global:
     MODE: debug
     LOG_LEVEL: 3
-    DB_USER: "volume-manager"
     DB_SSLMODE: "false"
-    DB_BASE: "volume-manager"
+    DB_USER: "volumemanager"
+    DB_BASE: "volumemanager"
     LISTEN_ADDR: ":4343"
   local:
     DB_HOST: "postgres-master.postgres.svc.cluster.local:5432"
@@ -33,6 +33,6 @@ env:
 postgresql:
   persistence:
     enabled: false
-  postgresDatabase: volume-manager
+  postgresDatabase: volumemanager
   # postgresUser: postgres
   # postgresPassword: password

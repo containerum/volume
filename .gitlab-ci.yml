@@ -9,7 +9,7 @@ variables:
   NAMESPACE: hosting
   SECRET: gitlab-registry
   REPOSITORY: ${CI_REGISTRY}/${CI_PROJECT_PATH}
-  SAND_PG_PASS: "vTsnHHnI"
+  SAND_PG_PASS: "6grZlyWwIrD"
 
 .docker-login: &docker-login
   before_script:
