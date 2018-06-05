@@ -193,7 +193,7 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//     description: volume created
 	//   default:
 	//     $ref: '#/responses/error'
-	group.POST("/", handlers.createVolumeHandler)
+	group.POST("", handlers.createVolumeHandler)
 
 	// swagger:operation GET /namespaces/{ns_id}/volumes/{label} Volumes GetVolume
 	//
@@ -233,7 +233,7 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//         $ref: '#/definitions/Volume'
 	//   default:
 	//     $ref: '#/responses/error'
-	group.GET("/", handlers.getUserVolumesHandler)
+	group.GET("", handlers.getUserVolumesHandler)
 
 	// swagger:operation GET /admin/volumes Volumes GetAllVolumes
 	//
@@ -290,7 +290,7 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//     description: volumes deleted
 	//   default:
 	//     $ref: '#/responses/error'
-	group.DELETE("/", handlers.deleteAllNamespaceVolumesHandler)
+	group.DELETE("", handlers.deleteAllNamespaceVolumesHandler)
 
 	// swagger:operation DELETE /volumes Volumes DeleteAllUserVolumes
 	//
