@@ -85,7 +85,7 @@ func (r *Router) SetupStorageHandlers(acts server.StorageActions) {
 	//     description: storage created
 	//   default:
 	//     $ref: '#/responses/error'
-	group.POST("/", handlers.createStorageHandler)
+	group.POST("", handlers.createStorageHandler)
 
 	// swagger:operation GET /storages Storages GetStorages
 	//
@@ -105,7 +105,7 @@ func (r *Router) SetupStorageHandlers(acts server.StorageActions) {
 	//         $ref: '#/definitions/Storage'
 	//   default:
 	//     $ref: '#/responses/error'
-	group.GET("/", handlers.getStoragesHandler)
+	group.GET("", handlers.getStoragesHandler)
 
 	// swagger:operation PUT /storages/{name} Storages UpdateStorage
 	//
