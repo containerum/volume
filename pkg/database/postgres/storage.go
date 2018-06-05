@@ -46,7 +46,6 @@ func (pgdb *PgDB) UpdateStorage(ctx context.Context, name string, storage model.
 	if storage.Name != name {
 		cnt, err := pgdb.db.Model(&storage).
 			WherePK().
-			WhereOr("name = ?", name).
 			Count()
 		if err != nil {
 			return pgdb.handleError(err)
@@ -57,12 +56,9 @@ func (pgdb *PgDB) UpdateStorage(ctx context.Context, name string, storage model.
 	}
 
 	result, err := pgdb.db.Model(&storage).
-		WherePK().
-		WhereOr("name = ?", name).
+		Where("name = ?", name).
 		Set("name = ?name").
 		Set("size = ?size").
-		Set("replicas = ?replicas").
-		Set("ips = ?ips").
 		Update()
 	if err != nil {
 		return pgdb.handleError(err)
