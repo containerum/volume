@@ -144,7 +144,6 @@ func (pgdb *PgDB) UpdateVolume(ctx context.Context, volume *model.Volume) error 
 		Set("label = ?label").
 		Set("capacity = ?capacity").
 		Set("ns_id = ?ns_id").
-		Set("storage_id = ?storage_id").
 		Set("access_mode = ?access_mode").
 		Returning("*").
 		Update()
