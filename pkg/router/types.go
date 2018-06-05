@@ -4,6 +4,7 @@ import (
 	"net/textproto"
 
 	"git.containerum.net/ch/volume-manager/pkg/errors"
+	"git.containerum.net/ch/volume-manager/pkg/router/middleware"
 	"git.containerum.net/ch/volume-manager/static"
 	"github.com/containerum/cherry"
 	"github.com/containerum/utils/httputil"
@@ -95,5 +96,6 @@ func NewRouter(engine gin.IRouter, tv *TranslateValidate) *Router {
 		"id": "omitempty,uuid",
 	}))
 	ret.engine.Use(httputil.SubstituteUserMiddleware(tv.Validate, tv.UniversalTranslator, errors.ErrRequestValidationFailed))
+	ret.engine.Use(middleware.RequiredUserHeaders())
 	return ret
 }
