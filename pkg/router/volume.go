@@ -292,7 +292,7 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//     $ref: '#/responses/error'
 	group.DELETE("/", handlers.deleteAllNamespaceVolumesHandler)
 
-	// swagger:operation DELETE /admin/volumes Volumes DeleteAllUserVolumes
+	// swagger:operation DELETE /volumes Volumes DeleteAllUserVolumes
 	//
 	// Delete all user volumes.
 	//
