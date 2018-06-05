@@ -22,6 +22,7 @@ func (pgdb *PgDB) VolumeByLabel(ctx context.Context, nsID, label string) (ret mo
 		ColumnExpr("?TableAlias.*").
 		Where("ns_id = ?ns_id").
 		Where("label = ?label").
+		Where("NOT deleted").
 		Select()
 	switch err {
 	case pg.ErrNoRows:
@@ -40,6 +41,7 @@ func (pgdb *PgDB) UserVolumes(ctx context.Context, userID string) (ret []model.V
 
 	err = pgdb.db.Model(&ret).
 		Where("owner_user_id = ?", userID).
+		Where("NOT deleted").
 		Select()
 	switch err {
 	case pg.ErrNoRows:
@@ -58,6 +60,7 @@ func (pgdb *PgDB) NamespaceVolumes(ctx context.Context, nsID string) (ret []mode
 
 	err = pgdb.db.Model(&ret).
 		Where("ns_id = ?", nsID).
+		Where("NOT deleted").
 		Select()
 	switch err {
 	case pg.ErrNoRows:
@@ -122,8 +125,18 @@ func (pgdb *PgDB) DeleteVolume(ctx context.Context, volume *model.Volume) error 
 func (pgdb *PgDB) DeleteVolumes(ctx context.Context, volumes []model.Volume) error {
 	pgdb.log.Debugf("delete volumes %+v", volumes)
 
+	if len(volumes) == 0 {
+		return nil
+	}
+
+	volIDs := make([]string, len(volumes))
+	for i := range volumes {
+		volIDs[i] = volumes[i].ID
+	}
+
+	volumes = nil
 	_, err := pgdb.db.Model(&volumes).
-		WherePK().
+		Where("id IN (?)", pg.In(volIDs)).
 		Set("deleted = TRUE").
 		Set("delete_time = now()").
 		Returning("*").
