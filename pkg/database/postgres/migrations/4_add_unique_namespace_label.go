@@ -8,12 +8,11 @@ import (
 func init() {
 	migrations.Register(func(db migrations.DB) error {
 		_, err := db.Model(&model.Volume{}).Exec( /* language=sql */
-			`ALTER TABLE "?TableName" DROP CONSTRAINT IF EXISTS unique_label_namespace;
-					ALTER TABLE "?TableName" ADD CONSTRAINT unique_label_namespace UNIQUE (ns_id, label)`)
+			`CREATE UNIQUE INDEX IF NOT EXISTS unique_label_namespace  ON "?TableName" (ns_id, label) WHERE NOT deleted`)
 		return err
 	}, func(db migrations.DB) error {
 		_, err := db.Model(&model.Volume{}).Exec( /* language=sql */
-			`ALTER TABLE "?TableName" DROP CONSTRAINT IF EXISTS unique_label_namespace`)
+			`DROP INDEX IF EXISTS unique_label_namespace`)
 		return err
 	})
 }
