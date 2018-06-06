@@ -45,7 +45,7 @@ func (pgdb *PgDB) UserVolumes(ctx context.Context, userID string) (ret []model.V
 		Select()
 	switch err {
 	case pg.ErrNoRows:
-		err = errors.ErrResourceNotExists().AddDetailF("no volumes found")
+		err = nil
 	default:
 		err = pgdb.handleError(err)
 	}
@@ -64,7 +64,7 @@ func (pgdb *PgDB) NamespaceVolumes(ctx context.Context, nsID string) (ret []mode
 		Select()
 	switch err {
 	case pg.ErrNoRows:
-		err = errors.ErrResourceNotExists().AddDetailF("no volumes found")
+		err = nil
 	default:
 		err = pgdb.handleError(err)
 	}
@@ -85,7 +85,7 @@ func (pgdb *PgDB) AllVolumes(ctx context.Context, filter database.VolumeFilter) 
 		Select()
 	switch err {
 	case pg.ErrNoRows:
-		err = errors.ErrResourceNotExists().AddDetailF("no volumes found")
+		err = nil
 	default:
 		err = pgdb.handleError(err)
 	}
