@@ -20,6 +20,7 @@ type VolumeActions interface {
 	ResizeVolume(ctx context.Context, nsID, label string, newTariffID string) error
 	GetVolume(ctx context.Context, nsID, label string) (kubeClientModel.Volume, error)
 	GetUserVolumes(ctx context.Context) ([]kubeClientModel.Volume, error)
+	GetNamespaceVolumes(ctx context.Context, nsID string) ([]kubeClientModel.Volume, error)
 	GetAllVolumes(ctx context.Context, page, perPage int, filters ...string) ([]kubeClientModel.Volume, error)
 	DeleteVolume(ctx context.Context, nsID, label string) error
 	DeleteAllNamespaceVolumes(ctx context.Context, nsID string) error
@@ -146,6 +147,26 @@ func (s *Server) GetVolume(ctx context.Context, nsID, label string) (kubeClientM
 	}
 
 	return vol.ToKube(), nil
+}
+
+func (s *Server) GetNamespaceVolumes(ctx context.Context, nsID string) ([]kubeClientModel.Volume, error) {
+	userID := httputil.MustGetUserID(ctx)
+	s.log.WithFields(logrus.Fields{
+		"user_id":      userID,
+		"namespace_id": nsID,
+	}).Infof("get namespace volumes")
+
+	vols, err := s.db.NamespaceVolumes(ctx, nsID)
+	if err != nil {
+		return nil, err
+	}
+
+	ret := make([]kubeClientModel.Volume, len(vols))
+	for i := range vols {
+		ret[i] = vols[i].ToKube()
+	}
+
+	return ret, nil
 }
 
 func (s *Server) GetUserVolumes(ctx context.Context) ([]kubeClientModel.Volume, error) {

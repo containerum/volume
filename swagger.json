@@ -138,8 +138,8 @@
         "tags": [
           "Volumes"
         ],
-        "summary": "Delete all namespace volumes.",
-        "operationId": "DeleteAllNamespaceVolumes",
+        "summary": "Get namespace volumes.",
+        "operationId": "GetNamespaceVolumes",
         "parameters": [
           {
             "$ref": "#/parameters/UserIDHeader"
@@ -156,7 +156,13 @@
         ],
         "responses": {
           "200": {
-            "description": "volumes deleted"
+            "description": "volumes response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Volume"
+              }
+            }
           },
           "default": {
             "$ref": "#/responses/error"
@@ -195,6 +201,35 @@
         "responses": {
           "201": {
             "description": "volume created"
+          },
+          "default": {
+            "$ref": "#/responses/error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "Delete all namespace volumes.",
+        "operationId": "DeleteAllNamespaceVolumes",
+        "parameters": [
+          {
+            "$ref": "#/parameters/UserIDHeader"
+          },
+          {
+            "$ref": "#/parameters/UserRoleHeader"
+          },
+          {
+            "$ref": "#/parameters/SubstitutedUserID"
+          },
+          {
+            "$ref": "#/parameters/NamespaceID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "volumes deleted"
           },
           "default": {
             "$ref": "#/responses/error"
@@ -445,6 +480,38 @@
       }
     },
     "/volumes": {
+      "get": {
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "Get user volumes.",
+        "operationId": "GetUserVolumes",
+        "parameters": [
+          {
+            "$ref": "#/parameters/UserIDHeader"
+          },
+          {
+            "$ref": "#/parameters/UserRoleHeader"
+          },
+          {
+            "$ref": "#/parameters/SubstitutedUserID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "volumes response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Volume"
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/responses/error"
+          }
+        }
+      },
       "delete": {
         "tags": [
           "Volumes"

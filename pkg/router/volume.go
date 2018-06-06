@@ -58,6 +58,21 @@ func (vh *volumeHandlers) getVolumeHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, ret)
 }
 
+func (vh *volumeHandlers) getNamespaceVolumesHandler(ctx *gin.Context) {
+	ret, err := vh.acts.GetNamespaceVolumes(ctx.Request.Context(), ctx.Param("ns_id"))
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(vh.tv.HandleError(err))
+		return
+	}
+
+	for i := range ret {
+		httputil.MaskForNonAdmin(ctx, &ret[i])
+	}
+
+	ctx.JSON(http.StatusOK, ret)
+}
+
 func (vh *volumeHandlers) getUserVolumesHandler(ctx *gin.Context) {
 	ret, err := vh.acts.GetUserVolumes(ctx.Request.Context())
 
@@ -215,9 +230,9 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//     $ref: '#/responses/error'
 	group.GET("/:label", middleware.ReadAccess, handlers.getVolumeHandler)
 
-	// swagger:operation GET /namespaces/{ns_id}/volumes Volumes GetUserVolumes
+	// swagger:operation GET /namespaces/{ns_id}/volumes Volumes GetNamespaceVolumes
 	//
-	// Get user volumes.
+	// Get namespace volumes.
 	//
 	// ---
 	// parameters:
@@ -234,7 +249,27 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//         $ref: '#/definitions/Volume'
 	//   default:
 	//     $ref: '#/responses/error'
-	group.GET("", middleware.ReadAccess, handlers.getUserVolumesHandler)
+	group.GET("", middleware.ReadAccess, handlers.getNamespaceVolumesHandler)
+
+	// swagger:operation GET /volumes Volumes GetUserVolumes
+	//
+	// Get user volumes.
+	//
+	// ---
+	// parameters:
+	//  - $ref: '#/parameters/UserIDHeader'
+	//  - $ref: '#/parameters/UserRoleHeader'
+	//  - $ref: '#/parameters/SubstitutedUserID'
+	// responses:
+	//   '200':
+	//     description: volumes response
+	//     schema:
+	//       type: array
+	//       items:
+	//         $ref: '#/definitions/Volume'
+	//   default:
+	//     $ref: '#/responses/error'
+	r.engine.GET("/volumes", middleware.ReadAccess, handlers.getUserVolumesHandler)
 
 	// swagger:operation GET /admin/volumes Volumes GetAllVolumes
 	//
