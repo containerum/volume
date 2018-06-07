@@ -110,7 +110,7 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 			Resource: model.Resource{
 				TariffID: &req.TariffID,
 				Label: func() string {
-					if freeVolume {
+					if !freeVolume {
 						return req.Label
 					} else {
 						return DefaultNamespaceVolumeName
