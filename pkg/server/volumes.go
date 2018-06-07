@@ -31,6 +31,11 @@ var StandardVolumeFilter = database.VolumeFilter{
 	NotDeleted: true,
 }
 
+const (
+	DefaultNamespaceVolumeName = "default-volume"
+	ZeroUUID                   = "00000000-0000-0000-0000-000000000000"
+)
+
 func (s *Server) DirectCreateVolume(ctx context.Context, nsID string, req model.DirectVolumeCreateRequest) error {
 	userID := httputil.MustGetUserID(ctx)
 	s.log.WithFields(logrus.Fields{
@@ -81,16 +86,23 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 		"user_id":   userID,
 	}).Infof("create volume")
 
-	tariff, err := s.clients.Billing.GetVolumeTariff(ctx, req.TariffID)
-	if err != nil {
-		return err
+	freeVolume := req.TariffID == ZeroUUID
+
+	var tariff billing.VolumeTariff
+
+	if !freeVolume {
+		var err error
+		tariff, err = s.clients.Billing.GetVolumeTariff(ctx, req.TariffID)
+		if err != nil {
+			return err
+		}
+
+		if chkErr := CheckTariff(tariff.Tariff, IsAdminRole(ctx)); chkErr != nil {
+			return chkErr
+		}
 	}
 
-	if chkErr := CheckTariff(tariff.Tariff, IsAdminRole(ctx)); chkErr != nil {
-		return chkErr
-	}
-
-	err = s.db.Transactional(func(tx database.DB) error {
+	err := s.db.Transactional(func(tx database.DB) error {
 		storage, getErr := tx.LeastUsedStorage(ctx, tariff.StorageLimit)
 		if getErr != nil {
 			return getErr
@@ -98,8 +110,14 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 
 		volume := model.Volume{
 			Resource: model.Resource{
-				TariffID:    &tariff.ID,
-				Label:       req.Label,
+				TariffID: &req.TariffID,
+				Label: func() string {
+					if freeVolume {
+						return req.Label
+					} else {
+						return DefaultNamespaceVolumeName
+					}
+				}(),
 				OwnerUserID: userID,
 			},
 			Capacity:    tariff.StorageLimit,
