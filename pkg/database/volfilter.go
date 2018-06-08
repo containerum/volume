@@ -6,14 +6,8 @@ type VolumeFilter struct {
 	Page    int
 	PerPage int
 
-	NotDeleted    bool `filter:"not_deleted"`
-	Deleted       bool `filter:"deleted"`
-	NotLimited    bool `filter:"not_limited"`
-	Limited       bool `filter:"limited"`
-	Owned         bool `filter:"owner"`
-	NotOwned      bool `filter:"not_owner"`
-	Persistent    bool `filter:"persistent"`
-	NotPersistent bool `filter:"not_persistent"`
+	NotDeleted bool `filter:"not_deleted"`
+	Deleted    bool `filter:"deleted"`
 }
 
 var volFilterCache = make(map[string]int)
