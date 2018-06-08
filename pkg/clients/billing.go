@@ -159,6 +159,11 @@ func (b *BillingHTTPClient) Unsubscribe(ctx context.Context, resourceID string) 
 func (b *BillingHTTPClient) MassiveUnsubscribe(ctx context.Context, resourceIDs []string) error {
 	b.log.WithField("resource_ids", resourceIDs).Debugln("massive unsubscribing")
 
+	if len(resourceIDs) == 0 {
+		// do not do call if we won`t unsubscribe anything actually
+		return nil
+	}
+
 	resp, err := b.client.R().
 		SetContext(ctx).
 		SetHeaders(httputil.RequestXHeadersMap(ctx)).
