@@ -134,6 +134,16 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 				NamespaceID: nsID,
 				StorageName: storage.Name,
 			}
+
+			subReq := billing.SubscribeTariffRequest{
+				TariffID:      tariff.ID,
+				ResourceType:  billing.Volume,
+				ResourceLabel: volume.Label,
+				ResourceID:    volume.ID,
+			}
+			if subErr := s.clients.Billing.Subscribe(ctx, subReq); subErr != nil {
+				return subErr
+			}
 		}
 
 		if createErr := tx.CreateVolume(ctx, &volume); createErr != nil {
@@ -144,16 +154,6 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 
 		if createErr := s.clients.KubeAPI.CreateVolume(ctx, nsID, &kubeVol); createErr != nil {
 			return createErr
-		}
-
-		subReq := billing.SubscribeTariffRequest{
-			TariffID:      tariff.ID,
-			ResourceType:  billing.Volume,
-			ResourceLabel: volume.Label,
-			ResourceID:    volume.ID,
-		}
-		if subErr := s.clients.Billing.Subscribe(ctx, subReq); subErr != nil {
-			return subErr
 		}
 
 		return nil
