@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"time"
 
 	berrors "github.com/containerum/bill-external/errors"
 	btypes "github.com/containerum/bill-external/models"
@@ -23,6 +24,7 @@ type BillingClient interface {
 	MassiveUnsubscribe(ctx context.Context, resourceIDs []string) error
 
 	GetVolumeTariff(ctx context.Context, tariffID string) (btypes.VolumeTariff, error)
+	GetTariffForNamespace(ctx context.Context, nsID string) (btypes.NamespaceTariff, error)
 }
 
 // Data for dummy client
@@ -202,6 +204,27 @@ func (b *BillingHTTPClient) GetVolumeTariff(ctx context.Context, tariffID string
 	return *resp.Result().(*btypes.VolumeTariff), nil
 }
 
+func (b *BillingHTTPClient) GetTariffForNamespace(ctx context.Context, nsID string) (btypes.NamespaceTariff, error) {
+	b.log.WithField("ns_id", nsID).Debugf("get tariff for namespace")
+
+	resp, err := b.client.R().
+		SetContext(ctx).
+		SetHeaders(httputil.RequestXHeadersMap(ctx)).
+		SetResult(btypes.NamespaceTariff{}).
+		SetPathParams(map[string]string{
+			"namespace": nsID,
+		}).
+		Get("/namespaces/{namespace}")
+	if err != nil {
+		return btypes.NamespaceTariff{}, err
+	}
+	if resp.Error() != nil {
+		return btypes.NamespaceTariff{}, resp.Error().(*cherry.Err)
+	}
+
+	return *resp.Result().(*btypes.NamespaceTariff), nil
+}
+
 func (b BillingHTTPClient) String() string {
 	return fmt.Sprintf("billing service http client: url=%s", b.client.HostURL)
 }
@@ -252,6 +275,28 @@ func (b BillingDummyClient) GetVolumeTariff(ctx context.Context, tariffID string
 		}
 	}
 	return btypes.VolumeTariff{}, berrors.ErrNotFound().AddDetailF("volume tariff %s not exists", tariffID)
+}
+
+func (b BillingDummyClient) GetTariffForNamespace(ctx context.Context, nsID string) (btypes.NamespaceTariff, error) {
+	b.log.WithField("ns_id", nsID).Debugf("get tariff for namespace")
+
+	return btypes.NamespaceTariff{
+		Tariff: btypes.Tariff{
+			ID:        "25d1d873-53ef-493f-9253-28f2f5ab5095",
+			Label:     "fake-ns-tariff",
+			Active:    true,
+			Public:    true,
+			CreatedAt: time.Now(),
+		},
+		CPULimit:         10,
+		MemoryLimit:      1024,
+		Traffic:          1000,
+		TrafficPrice:     0.2,
+		ExternalServices: 10,
+		InternalServices: 10,
+		VolumeSize:       10,
+	}, nil
+
 }
 
 func (b BillingDummyClient) String() string {
