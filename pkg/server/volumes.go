@@ -106,21 +106,34 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 			return getErr
 		}
 
-		volume := model.Volume{
-			Resource: model.Resource{
-				TariffID: &req.TariffID,
-				Label: func() string {
-					if !freeVolume {
-						return req.Label
-					} else {
-						return DefaultNamespaceVolumeName
-					}
-				}(),
-				OwnerUserID: userID,
-			},
-			Capacity:    tariff.StorageLimit,
-			NamespaceID: nsID,
-			StorageName: storage.Name,
+		var volume model.Volume
+		if freeVolume {
+			nsTariff, getErr := s.clients.Billing.GetTariffForNamespace(ctx, nsID)
+			if getErr != nil {
+				return getErr
+			}
+
+			volume = model.Volume{
+				Resource: model.Resource{
+					TariffID:    &req.TariffID,
+					Label:       DefaultNamespaceVolumeName,
+					OwnerUserID: userID,
+				},
+				Capacity:    nsTariff.VolumeSize,
+				NamespaceID: nsID,
+				StorageName: storage.Name,
+			}
+		} else {
+			volume = model.Volume{
+				Resource: model.Resource{
+					TariffID:    &req.TariffID,
+					Label:       req.Label,
+					OwnerUserID: userID,
+				},
+				Capacity:    tariff.StorageLimit,
+				NamespaceID: nsID,
+				StorageName: storage.Name,
+			}
 		}
 
 		if createErr := tx.CreateVolume(ctx, &volume); createErr != nil {
