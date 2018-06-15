@@ -172,7 +172,7 @@ func (s *Server) GetVolume(ctx context.Context, nsID, label string) (kubeClientM
 
 	vol, err := s.db.VolumeByLabel(ctx, nsID, label)
 	if err != nil {
-		return vol.ToKube(), err
+		return kubeClientModel.Volume{}, err
 	}
 
 	return vol.ToKube(), nil
