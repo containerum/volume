@@ -9,6 +9,7 @@ import (
 	kubeClientModel "github.com/containerum/kube-client/pkg/model"
 	"github.com/containerum/utils/httputil"
 	"github.com/sirupsen/logrus"
+	"github.com/satori/go.uuid"
 )
 
 type VolumeActions interface {
@@ -129,6 +130,7 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 					TariffID:    &req.TariffID,
 					Label:       req.Label,
 					OwnerUserID: userID,
+					ID: uuid.NewV4().String(),
 				},
 				Capacity:    tariff.StorageLimit,
 				NamespaceID: nsID,
