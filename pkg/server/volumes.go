@@ -10,6 +10,7 @@ import (
 	"github.com/containerum/utils/httputil"
 	"github.com/sirupsen/logrus"
 	"github.com/satori/go.uuid"
+	"git.containerum.net/ch/volume-manager/pkg/errors"
 )
 
 type VolumeActions interface {
@@ -112,6 +113,10 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 			nsTariff, getErr := s.clients.Billing.GetTariffForNamespace(ctx, nsID)
 			if getErr != nil {
 				return getErr
+			}
+
+			if nsTariff.VolumeSize==0 {
+				return errors.ErrQuotaExceeded()
 			}
 
 			volume = model.Volume{
