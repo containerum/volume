@@ -122,7 +122,7 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 			volume = model.Volume{
 				Resource: model.Resource{
 					TariffID:    &req.TariffID,
-					Label:       DefaultNamespaceVolumeName,
+					Label:       req.Label,
 					OwnerUserID: userID,
 				},
 				Capacity:    nsTariff.VolumeSize,
