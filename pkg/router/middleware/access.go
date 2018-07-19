@@ -38,7 +38,6 @@ func IsAdmin(ctx *gin.Context) {
 		gonic.Gonic(volErrors.ErrAdminRequired(), ctx)
 		return
 	}
-	return
 }
 
 func ReadAccess(ctx *gin.Context) {
@@ -74,7 +73,6 @@ func CheckAccess(ctx *gin.Context, level []kubeModel.AccessLevel) {
 		gonic.Gonic(volErrors.ErrResourceNotExists().AddDetails("namespace is not found"), ctx)
 		return
 	}
-	return
 }
 
 func containsAccess(access kubeModel.AccessLevel, in ...kubeModel.AccessLevel) bool {

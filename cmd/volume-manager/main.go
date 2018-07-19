@@ -149,8 +149,6 @@ func main() {
 				defer cancel()
 				return httpsrv.Shutdown(ctx)
 			}
-
-			return nil
 		},
 	}
 
