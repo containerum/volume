@@ -4,13 +4,17 @@ import (
 	"context"
 
 	"git.containerum.net/ch/volume-manager/pkg/database"
+	"git.containerum.net/ch/volume-manager/pkg/errors"
 	"git.containerum.net/ch/volume-manager/pkg/models"
 	billing "github.com/containerum/bill-external/models"
 	kubeClientModel "github.com/containerum/kube-client/pkg/model"
 	"github.com/containerum/utils/httputil"
-	"github.com/sirupsen/logrus"
 	"github.com/satori/go.uuid"
-	"git.containerum.net/ch/volume-manager/pkg/errors"
+	"github.com/sirupsen/logrus"
+)
+
+var (
+	_ VolumeActions = new(Server)
 )
 
 type VolumeActions interface {
@@ -19,9 +23,9 @@ type VolumeActions interface {
 	AdminResizeVolume(ctx context.Context, nsID, label string, newCapacity int) error
 	ResizeVolume(ctx context.Context, nsID, label string, newTariffID string) error
 	GetVolume(ctx context.Context, nsID, label string) (kubeClientModel.Volume, error)
-	GetUserVolumes(ctx context.Context) ([]kubeClientModel.Volume, error)
-	GetNamespaceVolumes(ctx context.Context, nsID string) ([]kubeClientModel.Volume, error)
-	GetAllVolumes(ctx context.Context, page, perPage int, filters ...string) ([]kubeClientModel.Volume, error)
+	GetUserVolumes(ctx context.Context) (kubeClientModel.VolumesList, error)
+	GetNamespaceVolumes(ctx context.Context, nsID string) (kubeClientModel.VolumesList, error)
+	GetAllVolumes(ctx context.Context, page, perPage int, filters ...string) (kubeClientModel.VolumesList, error)
 	DeleteVolume(ctx context.Context, nsID, label string) error
 	DeleteAllNamespaceVolumes(ctx context.Context, nsID string) error
 	DeleteAllUserVolumes(ctx context.Context) error
@@ -115,7 +119,7 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 				return getErr
 			}
 
-			if nsTariff.VolumeSize==0 {
+			if nsTariff.VolumeSize == 0 {
 				return errors.ErrQuotaExceeded()
 			}
 
@@ -135,7 +139,7 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 					TariffID:    &req.TariffID,
 					Label:       req.Label,
 					OwnerUserID: userID,
-					ID: uuid.NewV4().String(),
+					ID:          uuid.NewV4().String(),
 				},
 				Capacity:    tariff.StorageLimit,
 				NamespaceID: nsID,
@@ -185,7 +189,7 @@ func (s *Server) GetVolume(ctx context.Context, nsID, label string) (kubeClientM
 	return vol.ToKube(), nil
 }
 
-func (s *Server) GetNamespaceVolumes(ctx context.Context, nsID string) ([]kubeClientModel.Volume, error) {
+func (s *Server) GetNamespaceVolumes(ctx context.Context, nsID string) (kubeClientModel.VolumesList, error) {
 	userID := httputil.MustGetUserID(ctx)
 	s.log.WithFields(logrus.Fields{
 		"user_id":      userID,
@@ -194,7 +198,7 @@ func (s *Server) GetNamespaceVolumes(ctx context.Context, nsID string) ([]kubeCl
 
 	vols, err := s.db.NamespaceVolumes(ctx, nsID)
 	if err != nil {
-		return nil, err
+		return kubeClientModel.VolumesList{}, err
 	}
 
 	ret := make([]kubeClientModel.Volume, len(vols))
@@ -202,16 +206,16 @@ func (s *Server) GetNamespaceVolumes(ctx context.Context, nsID string) ([]kubeCl
 		ret[i] = vols[i].ToKube()
 	}
 
-	return ret, nil
+	return kubeClientModel.VolumesList{ret}, nil
 }
 
-func (s *Server) GetUserVolumes(ctx context.Context) ([]kubeClientModel.Volume, error) {
+func (s *Server) GetUserVolumes(ctx context.Context) (kubeClientModel.VolumesList, error) {
 	userID := httputil.MustGetUserID(ctx)
 	s.log.WithField("user_id", userID).Infof("get user volumes")
 
 	vols, err := s.db.UserVolumes(ctx, userID)
 	if err != nil {
-		return nil, err
+		return kubeClientModel.VolumesList{}, err
 	}
 
 	ret := make([]kubeClientModel.Volume, len(vols))
@@ -219,10 +223,10 @@ func (s *Server) GetUserVolumes(ctx context.Context) ([]kubeClientModel.Volume, 
 		ret[i] = vols[i].ToKube()
 	}
 
-	return ret, nil
+	return kubeClientModel.VolumesList{ret}, nil
 }
 
-func (s *Server) GetAllVolumes(ctx context.Context, page, perPage int, filters ...string) ([]kubeClientModel.Volume, error) {
+func (s *Server) GetAllVolumes(ctx context.Context, page, perPage int, filters ...string) (kubeClientModel.VolumesList, error) {
 	s.log.WithFields(logrus.Fields{
 		"page":     page,
 		"per_page": perPage,
@@ -240,7 +244,7 @@ func (s *Server) GetAllVolumes(ctx context.Context, page, perPage int, filters .
 
 	vols, err := s.db.AllVolumes(ctx, filter)
 	if err != nil {
-		return nil, err
+		return kubeClientModel.VolumesList{}, err
 	}
 
 	ret := make([]kubeClientModel.Volume, len(vols))
@@ -248,7 +252,7 @@ func (s *Server) GetAllVolumes(ctx context.Context, page, perPage int, filters .
 		ret[i] = vols[i].ToKube()
 	}
 
-	return ret, nil
+	return kubeClientModel.VolumesList{ret}, nil
 }
 
 func (s *Server) DeleteVolume(ctx context.Context, nsID, label string) error {
