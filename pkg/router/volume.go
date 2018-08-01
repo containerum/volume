@@ -221,6 +221,10 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//  - $ref: '#/parameters/UserRoleHeader'
 	//  - $ref: '#/parameters/SubstitutedUserID'
 	//  - $ref: '#/parameters/NamespaceID'
+	//  - name: label
+	//    in: path
+	//    type: string
+	//    required: true
 	// responses:
 	//   '200':
 	//     description: volume response
@@ -304,6 +308,10 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//  - $ref: '#/parameters/UserRoleHeader'
 	//  - $ref: '#/parameters/SubstitutedUserID'
 	//  - $ref: '#/parameters/NamespaceID'
+	//  - name: label
+	//    in: path
+	//    type: string
+	//    required: true
 	// responses:
 	//   '200':
 	//     description: volume deleted
@@ -354,6 +362,10 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//  - $ref: '#/parameters/UserRoleHeader'
 	//  - $ref: '#/parameters/SubstitutedUserID'
 	//  - $ref: '#/parameters/NamespaceID'
+	//  - name: label
+	//    in: path
+	//    type: string
+	//    required: true
 	//  - name: body
 	//    in: body
 	//    required: true
@@ -376,6 +388,10 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//  - $ref: '#/parameters/UserRoleHeader'
 	//  - $ref: '#/parameters/SubstitutedUserID'
 	//  - $ref: '#/parameters/NamespaceID'
+	//  - name: label
+	//    in: path
+	//    type: string
+	//    required: true
 	//  - name: body
 	//    in: body
 	//    required: true
