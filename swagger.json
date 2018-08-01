@@ -2387,48 +2387,45 @@
       "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/blang/semver"
     },
     "Volume": {
-      "description": "Volume describes volume",
+      "description": "Volume -- volume representation",
       "type": "object",
       "properties": {
+        "access": {
+          "$ref": "#/definitions/AccessLevel"
+        },
         "access_mode": {
           "$ref": "#/definitions/PersistentVolumeAccessMode"
         },
         "capacity": {
           "type": "integer",
-          "format": "int64",
+          "format": "uint64",
           "x-go-name": "Capacity"
         },
-        "create_time": {
+        "created_at": {
+          "description": "creation date in RFC3339 format",
           "type": "string",
-          "format": "date-time",
-          "x-go-name": "CreateTime"
+          "x-go-name": "CreatedAt"
         },
-        "delete_time": {
+        "deleted_at": {
           "type": "string",
-          "format": "date-time",
-          "x-go-name": "DeleteTime"
+          "x-go-name": "DeletedAt"
         },
-        "deleted": {
-          "type": "boolean",
-          "x-go-name": "Deleted"
-        },
-        "id": {
+        "name": {
           "type": "string",
-          "format": "uuid",
-          "x-go-name": "ID"
+          "x-go-name": "Name"
         },
-        "label": {
+        "owner": {
           "type": "string",
-          "x-go-name": "Label"
+          "x-go-name": "Owner"
         },
-        "namespace_id": {
+        "owner_login": {
           "type": "string",
-          "format": "uuid",
-          "x-go-name": "NamespaceID"
+          "x-go-name": "OwnerLogin"
         },
-        "owner_user_id": {
+        "status": {
+          "description": "delete date in RFC3339 format",
           "type": "string",
-          "x-go-name": "OwnerUserID"
+          "x-go-name": "Status"
         },
         "storage_name": {
           "type": "string",
@@ -2436,11 +2433,17 @@
         },
         "tariff_id": {
           "type": "string",
-          "format": "uuid",
           "x-go-name": "TariffID"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserAccess"
+          },
+          "x-go-name": "Users"
         }
       },
-      "x-go-package": "git.containerum.net/ch/volume-manager/pkg/models"
+      "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
     },
     "VolumeCreateRequest": {
       "description": "VolumeCreateRequest is a request object for creating volume",
