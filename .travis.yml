@@ -5,7 +5,7 @@ language: go
 env:
   global:
   - OWNER=containerum
-  - NAME=volume-manager
+  - NAME=volume
   - IMAGE_NAME=$OWNER/$NAME
   - MUSEUM=https://charts.containerum.io
 
