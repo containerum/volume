@@ -1,1 +1,1 @@
-App for managing volumes for Containerum project
+# volume-manager
