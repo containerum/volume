@@ -1,0 +1,66 @@
+# File for noice errors generation
+
+Name = "errors"
+SID = "volume-manager"
+
+[[error]]
+    Name = "ErrAdminRequired"
+    StatusHTTP = 403
+    Message = "Admin access required"
+    Comment = "User is not admin and has no permissions"
+    Kind = 1
+
+[[error]]
+    Name = "ErrRequiredHeadersNotProvided"
+    StatusHTTP = 400
+    Message = "Required headers not provided"
+    Kind = 2
+
+[[error]]
+    Name = "ErrRequestValidationFailed"
+    StatusHTTP = 400
+    Message = "Request validation failed"
+    Comment = "Validation error when parsing request"
+    Kind = 3
+
+[[error]]
+    Name = "ErrInternal"
+    StatusHTTP = 500
+    Message = "Internal error"
+    Kind = 4
+
+[[error]]
+    Name = "ErrDatabase"
+    StatusHTTP = 500
+    Message = "Database error"
+    Kind = 5
+
+[[error]]
+    Name = "ErrResourceNotExists"
+    StatusHTTP = 404
+    Message = "Resource not exists"
+    Kind = 6
+
+[[error]]
+    Name = "ErrResourceAlreadyExists"
+    StatusHTTP = 400
+    Message = "Resource already exists"
+    Kind = 7
+
+[[error]]
+    Name = "ErrQuotaExceeded"
+    StatusHTTP = 400
+    Message = "Resource quota exceeded"
+    Kind = 8
+
+[[error]]
+    Name = "ErrNoFreeStorages"
+    StatusHTTP = 507
+    Message = "No free storages found for volume"
+    Kind = 9
+
+[[error]]
+    Name = "ErrStorageDelete"
+    StatusHTTP = 400
+    Message = "Can`t delete storage with volumes"
+    Kind = 10

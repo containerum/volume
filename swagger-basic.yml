@@ -1,0 +1,45 @@
+swagger: "2.0"
+definitions:
+  ResourceUpdateName:
+    $ref: "vendor/github.com/containerum/kube-client/swagger.json#/definitions/ResourceUpdateName"
+  ResourceUpdateUserAccess:
+    $ref: "vendor/github.com/containerum/kube-client/swagger.json#/definitions/ResourceUpdateUserAccess"
+  CreateVolume:
+    $ref: "vendor/github.com/containerum/kube-client/swagger.json#/definitions/CreateVolume"
+  ResourceType:
+    $ref: "vendor/github.com/containerum/bill-external/swagger.json#/definitions/ResourceType"
+parameters:
+  SubstitutedUserID:
+    $ref: "vendor/github.com/containerum/utils/httputil/swagger.json#/parameters/SubstitutedUserID"
+  UserIDHeader:
+    $ref: "vendor/github.com/containerum/utils/httputil/swagger.json#/parameters/UserIDHeader"
+  UserRoleHeader:
+    $ref: "vendor/github.com/containerum/utils/httputil/swagger.json#/parameters/UserRoleHeader"
+  PageNum:
+    name: page
+    in: query
+    type: integer
+    minimum: 0
+  PerPageLimit:
+    name: per_page
+    in: query
+    type: integer
+    minimum: 0
+  Filters:
+    name: filter
+    in: query
+    type: string
+    required: false
+    description: A set of filters separated with comma. See "dao" package for more information.
+  NamespaceID:
+    name: ns_id
+    in: path
+    type: string
+    format: uuid
+    required: true
+    description: Namespace ID
+responses:
+  error:
+    description: cherry error
+    schema:
+      $ref: "vendor/github.com/containerum/cherry/swagger.json#/definitions/Err"

@@ -1,0 +1,38 @@
+Name = "errors"
+SID = "billing-manager"
+
+[[error]]
+  Name = "ErrInternal"
+  StatusHTTP = 500
+  Message = "Internal error"
+  Kind = 1
+
+[[error]]
+  Name = "ErrNotFound"
+  StatusHTTP = 404
+  Message = "Not found"
+  Kind = 2
+
+[[error]]
+  Name = "ErrDatabase"
+  StatusHTTP = 500
+  Message = "Database error"
+  Kind = 3
+
+[[error]]
+  Name = "ErrPermissionDenied"
+  StatusHTTP = 403
+  Message = "Permission denied"
+  Kind = 4
+
+[[error]]
+  Name = "ErrBadRequest"
+  StatusHTTP = 400
+  Message = "Bad request"
+  Kind = 5
+
+[[error]]
+  Name = "ErrConflict"
+  StatusHTTP = 409
+  Message = "Conflict: already exists"
+  Kind = 6
