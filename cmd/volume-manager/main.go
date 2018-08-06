@@ -27,6 +27,7 @@ import (
 
 //go:generate swagger generate spec -m -i ../../swagger-basic.yml -o ../../swagger.json
 //go:generate swagger flatten ../../swagger.json -o ../../swagger.json
+//go:generate swagger validate ../../swagger.json
 
 func exitOnError(err error) {
 	if err != nil {
@@ -80,10 +81,7 @@ func main() {
 				return err
 			}
 
-			listenAddr, err := getListenAddr(ctx)
-			if err != nil {
-				return err
-			}
+			listenAddr := getListenAddr(ctx)
 
 			translate := setupTranslator()
 			validate := validation.StandardPermissionsValidator(translate)
@@ -137,8 +135,8 @@ func main() {
 
 			// Wait for interrupt signal to gracefully shutdown the server with
 			// a timeout of 5 seconds.
-			quit := make(chan os.Signal)
-			signal.Notify(quit, os.Interrupt, os.Kill) // subscribe on interrupt event
+			quit := make(chan os.Signal, 1)
+			signal.Notify(quit, os.Interrupt) // subscribe on interrupt event
 
 			select {
 			case err := <-errCh:
@@ -149,8 +147,6 @@ func main() {
 				defer cancel()
 				return httpsrv.Shutdown(ctx)
 			}
-
-			return nil
 		},
 	}
 

@@ -8,7 +8,8 @@
   "swagger": "2.0",
   "info": {
     "description": "Volume-Manager service stores volumes and storage and allows to manage them",
-    "title": "Volume-Manager API"
+    "title": "Volume-Manager API",
+    "version": "0.0.1"
   },
   "paths": {
     "/admin/namespaces/{ns_id}/volumes/{label}": {
@@ -48,6 +49,12 @@
             "format": "uuid",
             "description": "Namespace ID",
             "name": "ns_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "label",
             "in": "path",
             "required": true
           },
@@ -418,6 +425,12 @@
             "name": "ns_id",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "string",
+            "name": "label",
+            "in": "path",
+            "required": true
           }
         ],
         "responses": {
@@ -471,6 +484,12 @@
             "format": "uuid",
             "description": "Namespace ID",
             "name": "ns_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "label",
             "in": "path",
             "required": true
           },
@@ -531,6 +550,12 @@
             "format": "uuid",
             "description": "Namespace ID",
             "name": "ns_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "label",
             "in": "path",
             "required": true
           }
@@ -2130,6 +2155,11 @@
           "x-go-name": "Name"
         },
         "size": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Size"
+        },
+        "used": {
           "type": "integer",
           "format": "int64",
           "x-go-name": "Used"
