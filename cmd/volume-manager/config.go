@@ -69,8 +69,8 @@ func setupDB(ctx *cli.Context) (database.DB, error) {
 		}()))
 }
 
-func getListenAddr(ctx *cli.Context) (string, error) {
-	return ctx.String(ListenAddrFlag.Name), nil
+func getListenAddr(ctx *cli.Context) string {
+	return ctx.String(ListenAddrFlag.Name)
 }
 
 func setupTranslator() *ut.UniversalTranslator {
@@ -101,13 +101,13 @@ func setupKubeAPIClient(addr string) (clients.KubeAPIClient, error) {
 
 func setupServiceClients(ctx *cli.Context) (*server.Clients, error) {
 	var errs []error
-	var clients server.Clients
+	var serverClients server.Clients
 	var err error
 
-	if clients.Billing, err = setupBillingClient(ctx.String(BillingAddrFlag.Name)); err != nil {
+	if serverClients.Billing, err = setupBillingClient(ctx.String(BillingAddrFlag.Name)); err != nil {
 		errs = append(errs, err)
 	}
-	if clients.KubeAPI, err = setupKubeAPIClient(ctx.String(KubeAPIAddrFlag.Name)); err != nil {
+	if serverClients.KubeAPI, err = setupKubeAPIClient(ctx.String(KubeAPIAddrFlag.Name)); err != nil {
 		errs = append(errs, err)
 	}
 
@@ -115,13 +115,13 @@ func setupServiceClients(ctx *cli.Context) (*server.Clients, error) {
 		return nil, fmt.Errorf("clients setup errors: %v", errs)
 	}
 
-	v := reflect.ValueOf(clients)
-	for i := 0; i < reflect.TypeOf(clients).NumField(); i++ {
+	v := reflect.ValueOf(serverClients)
+	for i := 0; i < reflect.TypeOf(serverClients).NumField(); i++ {
 		f := v.Field(i)
 		if str, ok := f.Interface().(fmt.Stringer); ok {
 			logrus.Infof("%s", str)
 		}
 	}
 
-	return &clients, nil
+	return &serverClients, nil
 }

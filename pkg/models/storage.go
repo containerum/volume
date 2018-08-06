@@ -58,5 +58,5 @@ func (s *Storage) BeforeDelete(db orm.DB) error {
 type UpdateStorageRequest struct {
 	Name *string `json:"name,omitempty"`
 	Size *int    `json:"size,omitempty" binding:"omitempty,gt=0,gtecsfield=Used"`
-	Used *int    `json:"size,omitempty"`
+	Used *int    `json:"used,omitempty"`
 }
