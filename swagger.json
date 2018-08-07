@@ -901,53 +901,6 @@
       },
       "x-go-package": "git.containerum.net/ch/volume-manager/pkg/models"
     },
-    "AvailableSolution": {
-      "description": "AvailableSolution -- solution which user can run",
-      "type": "object",
-      "properties": {
-        "active": {
-          "type": "boolean",
-          "x-go-name": "Active"
-        },
-        "id": {
-          "type": "string",
-          "x-go-name": "ID"
-        },
-        "images": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "Images"
-        },
-        "limits": {
-          "$ref": "#/definitions/SolutionLimits"
-        },
-        "name": {
-          "type": "string",
-          "x-go-name": "Name"
-        },
-        "url": {
-          "type": "string",
-          "x-go-name": "URL"
-        }
-      },
-      "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
-    },
-    "AvailableSolutionsList": {
-      "description": "AvailableSolutionsList -- list of available solutions",
-      "type": "object",
-      "properties": {
-        "solutions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/AvailableSolution"
-          },
-          "x-go-name": "Solutions"
-        }
-      },
-      "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
-    },
     "ChangeTariffRequest": {
       "description": "ChangeTariffRequest contains parameters needed for tariff changing",
       "type": "object",
@@ -997,6 +950,10 @@
         "name": {
           "type": "string",
           "x-go-name": "Name"
+        },
+        "namespace": {
+          "type": "string",
+          "x-go-name": "Namespace"
         },
         "owner": {
           "type": "string",
@@ -1168,6 +1125,13 @@
           "type": "string",
           "x-go-name": "DeletedAt"
         },
+        "image_pull_secret": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "ImagePullSecrets"
+        },
         "name": {
           "type": "string",
           "x-go-name": "Name"
@@ -1276,6 +1240,10 @@
         "label": {
           "type": "string",
           "x-go-name": "Label"
+        },
+        "storage": {
+          "type": "string",
+          "x-go-name": "Storage"
         }
       },
       "x-go-package": "git.containerum.net/ch/volume-manager/pkg/models"
@@ -1393,6 +1361,10 @@
         "name": {
           "type": "string",
           "x-go-name": "Name"
+        },
+        "namespace": {
+          "type": "string",
+          "x-go-name": "Namespace"
         },
         "owner": {
           "type": "string",
@@ -1653,11 +1625,11 @@
           "x-go-name": "Deploy"
         },
         "image_pull_secret": {
-          "type": "object",
-          "additionalProperties": {
+          "type": "array",
+          "items": {
             "type": "string"
           },
-          "x-go-name": "ImagePullSecret"
+          "x-go-name": "ImagePullSecrets"
         },
         "name": {
           "type": "string",
@@ -2004,6 +1976,49 @@
       },
       "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
     },
+    "Solution": {
+      "description": "Solution -- running solution",
+      "type": "object",
+      "required": [
+        "template",
+        "name",
+        "namespace"
+      ],
+      "properties": {
+        "branch": {
+          "type": "string",
+          "x-go-name": "Branch"
+        },
+        "env": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "x-go-name": "Env"
+        },
+        "id": {
+          "type": "string",
+          "x-go-name": "ID"
+        },
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        },
+        "namespace": {
+          "type": "string",
+          "x-go-name": "Namespace"
+        },
+        "template": {
+          "type": "string",
+          "x-go-name": "Template"
+        },
+        "url": {
+          "type": "string",
+          "x-go-name": "URL"
+        }
+      },
+      "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
+    },
     "SolutionEnv": {
       "description": "SolutionEnv -- solution environment variables",
       "type": "object",
@@ -2023,11 +2038,13 @@
       "type": "object",
       "properties": {
         "cpu": {
-          "type": "string",
+          "type": "integer",
+          "format": "uint64",
           "x-go-name": "CPU"
         },
         "ram": {
-          "type": "string",
+          "type": "integer",
+          "format": "uint64",
           "x-go-name": "RAM"
         }
       },
@@ -2044,6 +2061,67 @@
             "format": "int64"
           },
           "x-go-name": "Resources"
+        }
+      },
+      "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
+    },
+    "SolutionTemplate": {
+      "description": "SolutionTemplate -- solution which user can run",
+      "type": "object",
+      "properties": {
+        "active": {
+          "type": "boolean",
+          "x-go-name": "Active"
+        },
+        "id": {
+          "type": "string",
+          "x-go-name": "ID"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Images"
+        },
+        "limits": {
+          "$ref": "#/definitions/SolutionLimits"
+        },
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        },
+        "url": {
+          "type": "string",
+          "x-go-name": "URL"
+        }
+      },
+      "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
+    },
+    "SolutionsList": {
+      "description": "SolutionsList -- list of running solution",
+      "type": "object",
+      "properties": {
+        "solutions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Solution"
+          },
+          "x-go-name": "Solutions"
+        }
+      },
+      "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
+    },
+    "SolutionsTemplatesList": {
+      "description": "SolutionsTemplatesList -- list of available solutions",
+      "type": "object",
+      "properties": {
+        "solutions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SolutionTemplate"
+          },
+          "x-go-name": "Solutions"
         }
       },
       "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
@@ -2185,7 +2263,7 @@
       "type": "object",
       "properties": {
         "access": {
-          "$ref": "#/definitions/UserGroupAccess"
+          "$ref": "#/definitions/AccessLevel"
         },
         "created_at": {
           "description": "creation date in RFC3339 format",
@@ -2232,7 +2310,7 @@
       "type": "object",
       "properties": {
         "access": {
-          "$ref": "#/definitions/UserGroupAccess"
+          "$ref": "#/definitions/AccessLevel"
         },
         "id": {
           "type": "string",
@@ -2298,63 +2376,6 @@
       },
       "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
     },
-    "UserSolution": {
-      "description": "UserSolution -- running solution",
-      "type": "object",
-      "required": [
-        "template",
-        "name",
-        "namespace"
-      ],
-      "properties": {
-        "branch": {
-          "type": "string",
-          "x-go-name": "Branch"
-        },
-        "env": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "x-go-name": "Env"
-        },
-        "id": {
-          "type": "string",
-          "x-go-name": "ID"
-        },
-        "name": {
-          "type": "string",
-          "x-go-name": "Name"
-        },
-        "namespace": {
-          "type": "string",
-          "x-go-name": "Namespace"
-        },
-        "template": {
-          "type": "string",
-          "x-go-name": "Template"
-        },
-        "url": {
-          "type": "string",
-          "x-go-name": "URL"
-        }
-      },
-      "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
-    },
-    "UserSolutionsList": {
-      "description": "UserSolutionsList -- list of running solution",
-      "type": "object",
-      "properties": {
-        "solutions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/UserSolution"
-          },
-          "x-go-name": "Solutions"
-        }
-      },
-      "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
-    },
     "Version": {
       "description": "Version represents a semver compatible version",
       "type": "object",
@@ -2387,48 +2408,45 @@
       "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/blang/semver"
     },
     "Volume": {
-      "description": "Volume describes volume",
+      "description": "Volume -- volume representation",
       "type": "object",
       "properties": {
+        "access": {
+          "$ref": "#/definitions/AccessLevel"
+        },
         "access_mode": {
           "$ref": "#/definitions/PersistentVolumeAccessMode"
         },
         "capacity": {
           "type": "integer",
-          "format": "int64",
+          "format": "uint64",
           "x-go-name": "Capacity"
         },
-        "create_time": {
+        "created_at": {
+          "description": "creation date in RFC3339 format",
           "type": "string",
-          "format": "date-time",
-          "x-go-name": "CreateTime"
+          "x-go-name": "CreatedAt"
         },
-        "delete_time": {
+        "deleted_at": {
           "type": "string",
-          "format": "date-time",
-          "x-go-name": "DeleteTime"
+          "x-go-name": "DeletedAt"
         },
-        "deleted": {
-          "type": "boolean",
-          "x-go-name": "Deleted"
-        },
-        "id": {
+        "name": {
           "type": "string",
-          "format": "uuid",
-          "x-go-name": "ID"
+          "x-go-name": "Name"
         },
-        "label": {
+        "owner": {
           "type": "string",
-          "x-go-name": "Label"
+          "x-go-name": "Owner"
         },
-        "namespace_id": {
+        "owner_login": {
           "type": "string",
-          "format": "uuid",
-          "x-go-name": "NamespaceID"
+          "x-go-name": "OwnerLogin"
         },
-        "owner_user_id": {
+        "status": {
+          "description": "delete date in RFC3339 format",
           "type": "string",
-          "x-go-name": "OwnerUserID"
+          "x-go-name": "Status"
         },
         "storage_name": {
           "type": "string",
@@ -2436,11 +2454,17 @@
         },
         "tariff_id": {
           "type": "string",
-          "format": "uuid",
           "x-go-name": "TariffID"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserAccess"
+          },
+          "x-go-name": "Users"
         }
       },
-      "x-go-package": "git.containerum.net/ch/volume-manager/pkg/models"
+      "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
     },
     "VolumeCreateRequest": {
       "description": "VolumeCreateRequest is a request object for creating volume",
