@@ -32,6 +32,7 @@ type VolumesList struct {
 type CreateVolume struct {
 	TariffID string `json:"tariff_id"`
 	Label    string `json:"label"`
+	Storage  string `json:"storage"`
 }
 
 // ResourceUpdateName -- contains new resource name
