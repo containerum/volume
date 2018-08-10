@@ -24,9 +24,6 @@ func (pgdb *PgDB) CreateStorage(ctx context.Context, storage *model.Storage) err
 			Set("size = ?size").
 			Set("deleted = FALSE").
 			Update()
-		if err != nil {
-			return pgdb.handleError(err)
-		}
 		return pgdb.handleError(err)
 	}
 
