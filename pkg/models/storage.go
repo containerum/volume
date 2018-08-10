@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	"git.containerum.net/ch/volume-manager/pkg/errors"
 	"github.com/go-pg/pg/orm"
 )
@@ -18,6 +20,10 @@ type Storage struct {
 	Used int `sql:"used,notnull" json:"used" binding:"gte=0,ltecsfield=Size"`
 
 	Volumes []*Volume `pg:"fk:storage_id" sql:"-" json:"volumes"`
+
+	Deleted bool `sql:"deleted,notnull" json:"deleted,omitempty"`
+
+	DeleteTime *time.Time `sql:"delete_time" json:"delete_time,omitempty"`
 }
 
 func (s *Storage) BeforeInsert(db orm.DB) error {

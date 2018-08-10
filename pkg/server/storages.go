@@ -25,8 +25,8 @@ func (s *Server) CreateStorage(ctx context.Context, storage model.Storage) error
 
 func (s *Server) GetStorages(ctx context.Context) ([]model.Storage, error) {
 	s.log.Infof("get storages")
-	storages,err := s.db.AllStorages(ctx)
-	if err==nil && storages==nil {
+	storages, err := s.db.AllStorages(ctx)
+	if err == nil && storages == nil {
 		storages = make([]model.Storage, 0)
 	}
 	return storages, err

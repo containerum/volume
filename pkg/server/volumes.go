@@ -4,13 +4,13 @@ import (
 	"context"
 
 	"git.containerum.net/ch/volume-manager/pkg/database"
+	"git.containerum.net/ch/volume-manager/pkg/errors"
 	"git.containerum.net/ch/volume-manager/pkg/models"
 	billing "github.com/containerum/bill-external/models"
 	kubeClientModel "github.com/containerum/kube-client/pkg/model"
 	"github.com/containerum/utils/httputil"
-	"github.com/sirupsen/logrus"
 	"github.com/satori/go.uuid"
-	"git.containerum.net/ch/volume-manager/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type VolumeActions interface {
@@ -115,7 +115,7 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 				return getErr
 			}
 
-			if nsTariff.VolumeSize==0 {
+			if nsTariff.VolumeSize == 0 {
 				return errors.ErrQuotaExceeded()
 			}
 
@@ -135,7 +135,7 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 					TariffID:    &req.TariffID,
 					Label:       req.Label,
 					OwnerUserID: userID,
-					ID: uuid.NewV4().String(),
+					ID:          uuid.NewV4().String(),
 				},
 				Capacity:    tariff.StorageLimit,
 				NamespaceID: nsID,
