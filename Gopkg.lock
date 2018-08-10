@@ -30,8 +30,8 @@
     "adaptors/cherrylog",
     "adaptors/gonic"
   ]
-  revision = "34f7a2a139b36c20a34b93738dda33476efad47d"
-  version = "v1.0.1"
+  revision = "f4fe137f837222131dcefcfa49845d189b5fc6f2"
+  version = "v1.0.2"
 
 [[projects]]
   name = "github.com/containerum/kube-client"
@@ -39,8 +39,8 @@
     ".",
     "pkg/model"
   ]
-  revision = "84994c3603435e72e840178917f0ee88b0da0bf8"
-  version = "v0.23.17"
+  revision = "bbb01431e0c4336caff21604668bf80247de8871"
+  version = "v0.23.22"
 
 [[projects]]
   name = "github.com/containerum/utils"
@@ -148,8 +148,8 @@
 [[projects]]
   name = "github.com/json-iterator/go"
   packages = ["."]
-  revision = "ab8a2e0c74be9d3be70b3184d9acc634935ded82"
-  version = "1.1.4"
+  revision = "1624edc4454b8682399def8740d46db5e4362ba4"
+  version = "1.1.5"
 
 [[projects]]
   name = "github.com/jtolds/gls"
@@ -196,8 +196,8 @@
 [[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
-  revision = "c155da19408a8799da419ed3eeb0cb5db0ad5dbc"
-  version = "v1.0.5"
+  revision = "3e01752db0189b9157070a0e1668a620f9a85da2"
+  version = "v1.0.6"
 
 [[projects]]
   name = "github.com/smartystreets/assertions"
@@ -235,7 +235,7 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
-  revision = "a49355c7e3f8fe157a85be2f77e6e269a0f89602"
+  revision = "80fca2ff14a3fb7db622c9a5462f8ce9ea026cba"
 
 [[projects]]
   branch = "master"
@@ -247,7 +247,7 @@
     "webdav",
     "webdav/internal/xml"
   ]
-  revision = "d0887baf81f4598189d4e12a37c6da86f0bba4d0"
+  revision = "f4c29de78a2a91c00474a2e689954305c350adf9"
 
 [[projects]]
   branch = "master"
@@ -256,7 +256,7 @@
     "unix",
     "windows"
   ]
-  revision = "ac767d655b305d4e9612f5f6e33120b9176c4ad4"
+  revision = "2be389f392cd91df245b41638f818a1c041f0c08"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -315,6 +315,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "219404e9d39fa2412610d7d1aa872417d4c32303446399a6b0b0c8c8b8b82b39"
+  inputs-digest = "451228a8da3ede4d612f576b7bafd9ae18c72f57ea51a7268c1d68654eff1b76"
   solver-name = "gps-cdcl"
   solver-version = 1

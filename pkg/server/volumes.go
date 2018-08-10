@@ -50,7 +50,7 @@ func (s *Server) DirectCreateVolume(ctx context.Context, nsID string, req model.
 	}).Infof("create volume")
 
 	err := s.db.Transactional(func(tx database.DB) error {
-		storage, getErr := tx.LeastUsedStorage(ctx, req.Capacity)
+		storage, getErr := tx.StorageByName(ctx, req.Storage)
 		if getErr != nil {
 			return getErr
 		}
@@ -107,7 +107,7 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 	}
 
 	err := s.db.Transactional(func(tx database.DB) error {
-		storage, getErr := tx.LeastUsedStorage(ctx, tariff.StorageLimit)
+		storage, getErr := tx.StorageByName(ctx, req.Storage)
 		if getErr != nil {
 			return getErr
 		}
