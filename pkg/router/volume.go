@@ -66,8 +66,8 @@ func (vh *volumeHandlers) getNamespaceVolumesHandler(ctx *gin.Context) {
 		return
 	}
 
-	for i := range ret {
-		httputil.MaskForNonAdmin(ctx, &ret[i])
+	for i := range ret.Volumes {
+		httputil.MaskForNonAdmin(ctx, &ret.Volumes[i])
 	}
 
 	ctx.JSON(http.StatusOK, ret)
@@ -81,8 +81,8 @@ func (vh *volumeHandlers) getUserVolumesHandler(ctx *gin.Context) {
 		return
 	}
 
-	for i := range ret {
-		httputil.MaskForNonAdmin(ctx, &ret[i])
+	for i := range ret.Volumes {
+		httputil.MaskForNonAdmin(ctx, &ret.Volumes[i])
 	}
 
 	ctx.JSON(http.StatusOK, ret)

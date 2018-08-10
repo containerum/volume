@@ -52,9 +52,6 @@ spec:
             {{- if .Values.env.local.BILLING_ADDR }}
             - name: BILLING_ADDR
               value: "{{ .Values.env.local.BILLING_ADDR }}"
-            {{- else }}
-            - name: BILLING_ADDR
-              value: "{{ .Release.Name }}-billing-manager:5000"
             {{- end }}
 
             {{- if .Values.env.local.DB_PASSWORD }}
