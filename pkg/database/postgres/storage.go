@@ -11,7 +11,7 @@ import (
 func (pgdb *PgDB) CreateStorage(ctx context.Context, storage *model.Storage) error {
 	pgdb.log.Debugf("create storage %+v", storage)
 
-	cnt, err := pgdb.db.Model(&storage).
+	cnt, err := pgdb.db.Model(storage).
 		WherePK().
 		Count()
 	if err != nil {
@@ -19,14 +19,11 @@ func (pgdb *PgDB) CreateStorage(ctx context.Context, storage *model.Storage) err
 	}
 
 	if cnt > 0 {
-		_, err := pgdb.db.Model(&storage).
+		_, err := pgdb.db.Model(storage).
 			Where("name = ?", storage.Name).
 			Set("size = ?size").
 			Set("deleted = FALSE").
 			Update()
-		if err != nil {
-			return pgdb.handleError(err)
-		}
 		return pgdb.handleError(err)
 	}
 
@@ -106,6 +103,17 @@ func (pgdb *PgDB) DeleteStorage(ctx context.Context, storage *model.Storage) err
 	}
 	if result.RowsAffected() <= 0 {
 		return errors.ErrResourceNotExists().AddDetailF("storage %s not exists", storage.Name)
+	}
+	vols := make([]model.Volume, 0)
+
+	_, err = pgdb.db.Model(&vols).
+		Where("storage_name = ?", storage.Name).
+		Set("deleted = TRUE").
+		Set("delete_time = now()").
+		Returning("*").
+		Update()
+	if err != nil {
+		return pgdb.handleError(err)
 	}
 	return nil
 }
