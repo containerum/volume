@@ -104,6 +104,17 @@ func (pgdb *PgDB) DeleteStorage(ctx context.Context, storage *model.Storage) err
 	if result.RowsAffected() <= 0 {
 		return errors.ErrResourceNotExists().AddDetailF("storage %s not exists", storage.Name)
 	}
+	vols := make([]model.Volume, 0)
+
+	_, err = pgdb.db.Model(&vols).
+		Where("storage_name = ?", storage.Name).
+		Set("deleted = TRUE").
+		Set("delete_time = now()").
+		Returning("*").
+		Update()
+	if err != nil {
+		return pgdb.handleError(err)
+	}
 	return nil
 }
 
