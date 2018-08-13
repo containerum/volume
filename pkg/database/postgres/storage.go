@@ -11,7 +11,7 @@ import (
 func (pgdb *PgDB) CreateStorage(ctx context.Context, storage *model.Storage) error {
 	pgdb.log.Debugf("create storage %+v", storage)
 
-	cnt, err := pgdb.db.Model(&storage).
+	cnt, err := pgdb.db.Model(storage).
 		WherePK().
 		Count()
 	if err != nil {
@@ -19,7 +19,7 @@ func (pgdb *PgDB) CreateStorage(ctx context.Context, storage *model.Storage) err
 	}
 
 	if cnt > 0 {
-		_, err := pgdb.db.Model(&storage).
+		_, err := pgdb.db.Model(storage).
 			Where("name = ?", storage.Name).
 			Set("size = ?size").
 			Set("deleted = FALSE").
