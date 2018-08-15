@@ -18,6 +18,7 @@ type Volume struct {
 	StorageName string                     `json:"storage_name,omitempty"` //AKA StorageClass
 	AccessMode  PersistentVolumeAccessMode `json:"access_mode,omitempty"`
 	Users       []UserAccess               `json:"users,omitempty"`
+	Namespace   string                     `json:"namespace,omitempty" yaml:"namespace,omitempty"`
 }
 
 // VolumesList -- model for volumes list

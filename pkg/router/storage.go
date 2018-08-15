@@ -9,6 +9,7 @@ import (
 	"github.com/containerum/utils/httputil"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/sirupsen/logrus"
 )
 
 type storageHandlers struct {
@@ -28,6 +29,26 @@ func (sh *storageHandlers) createStorageHandler(ctx *gin.Context) {
 	}
 
 	ctx.Status(http.StatusCreated)
+}
+
+func (sh *storageHandlers) importStoragesHandler(ctx *gin.Context) {
+	var req []string
+	if err := ctx.ShouldBindWith(&req, binding.JSON); err != nil {
+		ctx.AbortWithStatusJSON(sh.tv.BadRequest(ctx, err))
+		return
+	}
+	for _, r := range req {
+		store := model.Storage{
+			Name: r,
+			Size: 100,
+		}
+
+		if err := sh.acts.CreateStorage(ctx.Request.Context(), store); err != nil {
+			logrus.Warn(err)
+		}
+	}
+
+	ctx.Status(http.StatusAccepted)
 }
 
 func (sh *storageHandlers) getStoragesHandler(ctx *gin.Context) {
@@ -151,4 +172,19 @@ func (r *Router) SetupStorageHandlers(acts server.StorageActions) {
 	//   default:
 	//     $ref: '#/responses/error'
 	group.DELETE("/:name", handlers.deleteStorageHandler)
+
+	// swagger:operation POST /import/storages Storages ImportStorages
+	//
+	// Import storages.
+	//
+	// ---
+	// parameters:
+	//  - $ref: '#/parameters/UserIDHeader'
+	//  - $ref: '#/parameters/UserRoleHeader'
+	// responses:
+	//   '202':
+	//     description: storages imported
+	//   default:
+	//     $ref: '#/responses/error'
+	r.engine.POST("/import/storages", handlers.importStoragesHandler)
 }

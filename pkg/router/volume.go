@@ -3,6 +3,8 @@ package router
 import (
 	"net/http"
 
+	kubeClientModel "github.com/containerum/kube-client/pkg/model"
+
 	"git.containerum.net/ch/volume-manager/pkg/errors"
 	"git.containerum.net/ch/volume-manager/pkg/models"
 	"git.containerum.net/ch/volume-manager/pkg/router/middleware"
@@ -11,6 +13,7 @@ import (
 	"github.com/containerum/utils/httputil"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/sirupsen/logrus"
 )
 
 type volumeHandlers struct {
@@ -30,6 +33,21 @@ func (vh *volumeHandlers) directCreateVolumeHandler(ctx *gin.Context) {
 	}
 
 	ctx.Status(http.StatusCreated)
+}
+
+func (vh *volumeHandlers) importVolumesHandler(ctx *gin.Context) {
+	var req kubeClientModel.VolumesList
+	if err := ctx.ShouldBindWith(&req, binding.JSON); err != nil {
+		ctx.AbortWithStatusJSON(vh.tv.BadRequest(ctx, err))
+		return
+	}
+	for _, vol := range req.Volumes {
+		if err := vh.acts.ImportVolume(ctx.Request.Context(), vol.Namespace, vol); err != nil {
+			logrus.Warn(err)
+		}
+	}
+
+	ctx.Status(http.StatusAccepted)
 }
 
 func (vh *volumeHandlers) createVolumeHandler(ctx *gin.Context) {
@@ -403,4 +421,25 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	//   default:
 	//     $ref: '#/responses/error'
 	adminGroup.PUT("/:label", handlers.adminResizeVolumeHandler)
+
+	// swagger:operation POST /import/volumes Volumes ImportVolumes
+	//
+	// Import volumes.
+	//
+	// ---
+	// parameters:
+	//  - $ref: '#/parameters/UserIDHeader'
+	//  - $ref: '#/parameters/UserRoleHeader'
+	//  - name: body
+	//    in: body
+	//    required: true
+	//    schema:
+	//      $ref: '#/definitions/VolumesList'
+	// responses:
+	//   '201':
+	//     description: volumes imported
+	//   default:
+	//     $ref: '#/responses/error'
+	r.engine.POST("/import/volumes", handlers.importVolumesHandler)
+
 }
