@@ -42,15 +42,15 @@
   version = "v1.0.2"
 
 [[projects]]
-  digest = "1:d652ab42537fde5cee32c1ef80660df9befcd9a3f080d333a0b998e586b6e30f"
+  digest = "1:5eba59b0e19d7727e7e4294c7435cbde6e38a396b20dd47738600380e7569428"
   name = "github.com/containerum/kube-client"
   packages = [
     ".",
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "972c4f252587d8d783aba690c36237d94f4e7715"
-  version = "v0.23.23"
+  revision = "23dd0850d05cd21c41f0699fced4c5791dea2df6"
+  version = "v0.23.26"
 
 [[projects]]
   digest = "1:f332cfcc393a262145934ed77269e485c04987ca5ed836c6937e36147d3103d5"
@@ -319,14 +319,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:21b27f093d86b15a6cb6b63591f664dce78ad3004bee2f649bc01a0f93b37612"
+  digest = "1:51bfac9fe01b6a949bfed6db70b00bada281f0d64e5296ec644163aa977bfee0"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "NUT"
-  revision = "14742f9018cd6651ec7364dc6ee08af0baaa1031"
+  revision = "1c9583448a9c3aa0f9a6a5241bf73c0bd8aafded"
 
 [[projects]]
   digest = "1:e7071ed636b5422cc51c0e3a6cebc229d6c9fffc528814b519a980641422d619"
