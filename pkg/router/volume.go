@@ -41,13 +41,22 @@ func (vh *volumeHandlers) importVolumesHandler(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(vh.tv.BadRequest(ctx, err))
 		return
 	}
+
+	resp := kubeClientModel.ImportResponse{
+		Imported: []kubeClientModel.ImportResult{},
+		Failed:   []kubeClientModel.ImportResult{},
+	}
+
 	for _, vol := range req.Volumes {
 		if err := vh.acts.ImportVolume(ctx.Request.Context(), vol.Namespace, vol); err != nil {
 			logrus.Warn(err)
+			resp.ImportFailed(vol.Name, vol.Namespace, err.Error())
+		} else {
+			resp.ImportSuccessful(vol.Name, vol.Namespace)
 		}
 	}
 
-	ctx.Status(http.StatusAccepted)
+	ctx.JSON(http.StatusAccepted, resp)
 }
 
 func (vh *volumeHandlers) createVolumeHandler(ctx *gin.Context) {
@@ -438,8 +447,9 @@ func (r *Router) SetupVolumeHandlers(acts server.VolumeActions) {
 	// responses:
 	//   '201':
 	//     description: volumes imported
+	//     schema:
+	//       $ref: '#/definitions/ImportResponse'
 	//   default:
 	//     $ref: '#/responses/error'
 	r.engine.POST("/import/volumes", handlers.importVolumesHandler)
-
 }

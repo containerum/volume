@@ -6,6 +6,7 @@ import (
 	"git.containerum.net/ch/volume-manager/pkg/errors"
 	"git.containerum.net/ch/volume-manager/pkg/models"
 	"git.containerum.net/ch/volume-manager/pkg/server"
+	kubeClientModel "github.com/containerum/kube-client/pkg/model"
 	"github.com/containerum/utils/httputil"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -37,6 +38,12 @@ func (sh *storageHandlers) importStoragesHandler(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(sh.tv.BadRequest(ctx, err))
 		return
 	}
+
+	resp := kubeClientModel.ImportResponse{
+		Imported: []kubeClientModel.ImportResult{},
+		Failed:   []kubeClientModel.ImportResult{},
+	}
+
 	for _, r := range req {
 		store := model.Storage{
 			Name: r,
@@ -45,10 +52,13 @@ func (sh *storageHandlers) importStoragesHandler(ctx *gin.Context) {
 
 		if err := sh.acts.CreateStorage(ctx.Request.Context(), store); err != nil {
 			logrus.Warn(err)
+			resp.ImportFailed(r, "", err.Error())
+		} else {
+			resp.ImportSuccessful(r, "")
 		}
 	}
 
-	ctx.Status(http.StatusAccepted)
+	ctx.JSON(http.StatusAccepted, resp)
 }
 
 func (sh *storageHandlers) getStoragesHandler(ctx *gin.Context) {
@@ -184,6 +194,8 @@ func (r *Router) SetupStorageHandlers(acts server.StorageActions) {
 	// responses:
 	//   '202':
 	//     description: storages imported
+	//     schema:
+	//       $ref: '#/definitions/ImportResponse'
 	//   default:
 	//     $ref: '#/responses/error'
 	r.engine.POST("/import/storages", handlers.importStoragesHandler)
