@@ -405,6 +405,10 @@ func (s *Server) AdminResizeVolume(ctx context.Context, nsID, label string, newC
 			return getErr
 		}
 
+		if newCapacity < vol.Capacity {
+			return errors.ErrDownResize()
+		}
+
 		vol.TariffID = nil
 		vol.Capacity = newCapacity
 
@@ -446,6 +450,10 @@ func (s *Server) ResizeVolume(ctx context.Context, nsID, label string, newTariff
 		vol, getErr := tx.VolumeByLabel(ctx, nsID, label)
 		if getErr != nil {
 			return getErr
+		}
+
+		if newTariff.StorageLimit < vol.Capacity {
+			return errors.ErrDownResize()
 		}
 
 		vol.TariffID = &newTariff.ID
