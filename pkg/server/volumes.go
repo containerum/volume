@@ -96,7 +96,7 @@ func (s *Server) ImportVolume(ctx context.Context, nsID string, req kubeClientMo
 		}
 
 		if req.Owner == "" {
-			req.Owner = "00000000-0000-0000-0000-000000000000"
+			req.Owner = ZeroUUID
 		}
 
 		volume := model.Volume{
