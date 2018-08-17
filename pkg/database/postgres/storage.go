@@ -11,7 +11,7 @@ import (
 func (pgdb *PgDB) CreateStorage(ctx context.Context, storage *model.Storage) error {
 	pgdb.log.Debugf("create storage %+v", storage)
 
-	cnt, err := pgdb.db.Model(&storage).
+	cnt, err := pgdb.db.Model(storage).
 		WherePK().
 		Count()
 	if err != nil {
@@ -19,14 +19,11 @@ func (pgdb *PgDB) CreateStorage(ctx context.Context, storage *model.Storage) err
 	}
 
 	if cnt > 0 {
-		_, err := pgdb.db.Model(&storage).
+		_, err := pgdb.db.Model(storage).
 			Where("name = ?", storage.Name).
 			Set("size = ?size").
 			Set("deleted = FALSE").
 			Update()
-		if err != nil {
-			return pgdb.handleError(err)
-		}
 		return pgdb.handleError(err)
 	}
 
@@ -96,9 +93,21 @@ func (pgdb *PgDB) UpdateStorage(ctx context.Context, name string, storage model.
 func (pgdb *PgDB) DeleteStorage(ctx context.Context, storage *model.Storage) error {
 	pgdb.log.WithField("name", storage.Name).Debugf("delete storage")
 
+	cnt, err := pgdb.db.Model(&model.Volume{}).
+		Where("storage_name = ?", storage.Name).
+		Where("NOT deleted").
+		Count()
+	if err != nil {
+		return err
+	}
+	if cnt > 0 {
+		return errors.ErrStorageDelete()
+	}
+
 	result, err := pgdb.db.Model(storage).WherePK().
 		Set("deleted = TRUE").
 		Set("delete_time = now()").
+		Set("used = 0").
 		Returning("*").
 		Update()
 	if err != nil {
@@ -107,6 +116,7 @@ func (pgdb *PgDB) DeleteStorage(ctx context.Context, storage *model.Storage) err
 	if result.RowsAffected() <= 0 {
 		return errors.ErrResourceNotExists().AddDetailF("storage %s not exists", storage.Name)
 	}
+
 	return nil
 }
 

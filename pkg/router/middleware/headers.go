@@ -62,7 +62,6 @@ func RequiredUserHeaders() gin.HandlerFunc {
 				notFoundHeaders := requireHeaders(ctx,
 					headers.UserRoleXHeader,
 					headers.UserNamespacesXHeader,
-					headers.UserVolumesXHeader,
 					headers.UserIDXHeader,
 				)
 				if len(notFoundHeaders) > 0 {

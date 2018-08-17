@@ -20,6 +20,7 @@ var (
 type VolumeActions interface {
 	DirectCreateVolume(ctx context.Context, nsID string, req model.DirectVolumeCreateRequest) error
 	CreateVolume(ctx context.Context, nsID string, req model.VolumeCreateRequest) error
+	ImportVolume(ctx context.Context, nsID string, req kubeClientModel.Volume) error
 	AdminResizeVolume(ctx context.Context, nsID, label string, newCapacity int) error
 	ResizeVolume(ctx context.Context, nsID, label string, newTariffID string) error
 	GetVolume(ctx context.Context, nsID, label string) (kubeClientModel.Volume, error)
@@ -72,6 +73,39 @@ func (s *Server) DirectCreateVolume(ctx context.Context, nsID string, req model.
 		kubeVol := volume.ToKube()
 
 		if createErr := s.clients.KubeAPI.CreateVolume(ctx, nsID, &kubeVol); createErr != nil {
+			return createErr
+		}
+
+		return nil
+	})
+
+	return err
+}
+
+func (s *Server) ImportVolume(ctx context.Context, nsID string, req kubeClientModel.Volume) error {
+	s.log.WithFields(logrus.Fields{
+		"ns_id":    nsID,
+		"capacity": req.Capacity,
+		"label":    req.Name,
+	}).Infof("import volume")
+
+	err := s.db.Transactional(func(tx database.DB) error {
+		storage, getErr := tx.StorageByName(ctx, req.StorageName)
+		if getErr != nil {
+			return getErr
+		}
+
+		volume := model.Volume{
+			Resource: model.Resource{
+				Label:       req.Name,
+				OwnerUserID: req.Owner,
+			},
+			Capacity:    int(req.Capacity),
+			NamespaceID: nsID,
+			StorageName: storage.Name,
+		}
+
+		if createErr := tx.CreateVolume(ctx, &volume); createErr != nil {
 			return createErr
 		}
 
@@ -371,6 +405,10 @@ func (s *Server) AdminResizeVolume(ctx context.Context, nsID, label string, newC
 			return getErr
 		}
 
+		if newCapacity < vol.Capacity {
+			return errors.ErrDownResize()
+		}
+
 		vol.TariffID = nil
 		vol.Capacity = newCapacity
 
@@ -412,6 +450,10 @@ func (s *Server) ResizeVolume(ctx context.Context, nsID, label string, newTariff
 		vol, getErr := tx.VolumeByLabel(ctx, nsID, label)
 		if getErr != nil {
 			return getErr
+		}
+
+		if newTariff.StorageLimit < vol.Capacity {
+			return errors.ErrDownResize()
 		}
 
 		vol.TariffID = &newTariff.ID

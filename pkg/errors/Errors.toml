@@ -64,3 +64,9 @@ SID = "volume-manager"
     StatusHTTP = 400
     Message = "Can`t delete storage with volumes"
     Kind = 10
+
+[[error]]
+    Name = "ErrDownResize"
+    StatusHTTP = 400
+    Message = "Can`t resize volume to lower capacity"
+    Kind = 11
