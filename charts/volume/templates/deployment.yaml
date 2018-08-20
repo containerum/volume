@@ -46,7 +46,7 @@ spec:
               value: "{{ .Values.env.local.KUBE_API_ADDR }}"
             {{- else }}
             - name: KUBE_API_ADDR
-              value: "{{ .Release.Name }}-kube-api:1214"
+              value: "http://{{ .Release.Name }}-kube:1214"
             {{- end }}
 
             {{- if .Values.env.local.BILLING_ADDR }}
