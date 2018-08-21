@@ -37,8 +37,7 @@ var StandardVolumeFilter = database.VolumeFilter{
 }
 
 const (
-	DefaultNamespaceVolumeName = "default-volume"
-	ZeroUUID                   = "00000000-0000-0000-0000-000000000000"
+	ZeroUUID = "00000000-0000-0000-0000-000000000000"
 )
 
 func (s *Server) DirectCreateVolume(ctx context.Context, nsID string, req model.DirectVolumeCreateRequest) error {
@@ -50,22 +49,26 @@ func (s *Server) DirectCreateVolume(ctx context.Context, nsID string, req model.
 		"user_id":  userID,
 	}).Infof("create volume")
 
+	storage, getErr := s.db.StorageByName(ctx, req.Storage)
+	if getErr != nil {
+		return getErr
+	}
+
+	if storage.Size-storage.Used-req.Capacity < 0 {
+		return errors.ErrNoFreeStorages()
+	}
+
+	volume := model.Volume{
+		Resource: model.Resource{
+			Label:       req.Label,
+			OwnerUserID: userID,
+		},
+		Capacity:    req.Capacity,
+		NamespaceID: nsID,
+		StorageName: storage.Name,
+	}
+
 	err := s.db.Transactional(func(tx database.DB) error {
-		storage, getErr := tx.StorageByName(ctx, req.Storage)
-		if getErr != nil {
-			return getErr
-		}
-
-		volume := model.Volume{
-			Resource: model.Resource{
-				Label:       req.Label,
-				OwnerUserID: userID,
-			},
-			Capacity:    req.Capacity,
-			NamespaceID: nsID,
-			StorageName: storage.Name,
-		}
-
 		if createErr := tx.CreateVolume(ctx, &volume); createErr != nil {
 			return createErr
 		}
@@ -144,57 +147,65 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 		}
 	}
 
-	err := s.db.Transactional(func(tx database.DB) error {
-		storage, getErr := tx.StorageByName(ctx, req.Storage)
+	storage, getErr := s.db.StorageByName(ctx, req.Storage)
+	if getErr != nil {
+		return getErr
+	}
+
+	var volume model.Volume
+	if freeVolume {
+		nsTariff, getErr := s.clients.Billing.GetTariffForNamespace(ctx, nsID)
 		if getErr != nil {
 			return getErr
 		}
 
-		var volume model.Volume
-		if freeVolume {
-			nsTariff, getErr := s.clients.Billing.GetTariffForNamespace(ctx, nsID)
-			if getErr != nil {
-				return getErr
-			}
-
-			if nsTariff.VolumeSize == 0 {
-				return errors.ErrQuotaExceeded()
-			}
-
-			volume = model.Volume{
-				Resource: model.Resource{
-					TariffID:    &req.TariffID,
-					Label:       req.Label,
-					OwnerUserID: userID,
-				},
-				Capacity:    nsTariff.VolumeSize,
-				NamespaceID: nsID,
-				StorageName: storage.Name,
-			}
-		} else {
-			volume = model.Volume{
-				Resource: model.Resource{
-					TariffID:    &req.TariffID,
-					Label:       req.Label,
-					OwnerUserID: userID,
-					ID:          uuid.NewV4().String(),
-				},
-				Capacity:    tariff.StorageLimit,
-				NamespaceID: nsID,
-				StorageName: storage.Name,
-			}
-
-			subReq := billing.SubscribeTariffRequest{
-				TariffID:      tariff.ID,
-				ResourceType:  billing.Volume,
-				ResourceLabel: volume.Label,
-				ResourceID:    volume.ID,
-			}
-			if subErr := s.clients.Billing.Subscribe(ctx, subReq); subErr != nil {
-				return subErr
-			}
+		if nsTariff.VolumeSize == 0 {
+			return errors.ErrQuotaExceeded()
 		}
 
+		if storage.Size-storage.Used-nsTariff.VolumeSize < 0 {
+			return errors.ErrNoFreeStorages()
+		}
+
+		volume = model.Volume{
+			Resource: model.Resource{
+				TariffID:    &req.TariffID,
+				Label:       req.Label,
+				OwnerUserID: userID,
+			},
+			Capacity:    nsTariff.VolumeSize,
+			NamespaceID: nsID,
+			StorageName: storage.Name,
+		}
+	} else {
+		if storage.Size-storage.Used-tariff.StorageLimit < 0 {
+			return errors.ErrNoFreeStorages()
+		}
+
+		volume = model.Volume{
+			Resource: model.Resource{
+				TariffID:    &req.TariffID,
+				Label:       req.Label,
+				OwnerUserID: userID,
+				ID:          uuid.NewV4().String(),
+			},
+			Capacity:    tariff.StorageLimit,
+			NamespaceID: nsID,
+			StorageName: storage.Name,
+		}
+
+		subReq := billing.SubscribeTariffRequest{
+			TariffID:      tariff.ID,
+			ResourceType:  billing.Volume,
+			ResourceLabel: volume.Label,
+			ResourceID:    volume.ID,
+		}
+		if subErr := s.clients.Billing.Subscribe(ctx, subReq); subErr != nil {
+			return subErr
+		}
+	}
+
+	err := s.db.Transactional(func(tx database.DB) error {
 		if createErr := tx.CreateVolume(ctx, &volume); createErr != nil {
 			return createErr
 		}

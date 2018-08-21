@@ -110,7 +110,7 @@ func ErrQuotaExceeded(params ...func(*cherry.Err)) *cherry.Err {
 }
 
 func ErrNoFreeStorages(params ...func(*cherry.Err)) *cherry.Err {
-	err := &cherry.Err{Message: "No free storages found for volume", StatusHTTP: 507, ID: cherry.ErrID{SID: "volume-manager", Kind: 0x9}, Details: []string(nil), Fields: cherry.Fields(nil)}
+	err := &cherry.Err{Message: "No free space found on storage", StatusHTTP: 507, ID: cherry.ErrID{SID: "volume-manager", Kind: 0x9}, Details: []string(nil), Fields: cherry.Fields(nil)}
 	for _, param := range params {
 		param(err)
 	}
