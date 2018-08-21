@@ -30,7 +30,7 @@ required = [
 
 [[constraint]]
   name = "github.com/containerum/kube-client"
-  version = "0.23.26"
+  version = "0.23.27"
 
 [[constraint]]
   name = "github.com/go-pg/pg"
@@ -54,7 +54,7 @@ required = [
 
 [[constraint]]
   name = "github.com/containerum/utils"
-  version = "~1.0.0"
+  version = "1.0.7"
 
 [[constraint]]
   branch = "v2"

@@ -13,9 +13,9 @@ import (
 	"git.containerum.net/ch/volume-manager/pkg/router"
 	"git.containerum.net/ch/volume-manager/pkg/server"
 	"git.containerum.net/ch/volume-manager/pkg/utils/validation"
-	"git.containerum.net/ch/volume-manager/pkg/utils/version"
 	"github.com/containerum/cherry/adaptors/cherrylog"
 	"github.com/containerum/cherry/adaptors/gonic"
+	"github.com/containerum/kube-client/pkg/model"
 	"github.com/containerum/utils/httputil"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/contrib/ginrus"
@@ -56,11 +56,13 @@ func prettyPrintFlags(ctx *cli.Context) {
 
 const httpServerContextKey = "httpsrv"
 
+var version string
+
 func main() {
 	app := cli.App{
 		Name:        "volume-manager",
 		Description: "Volume-Manager volumes management service for Container hosting",
-		Version:     version.VERSION,
+		Version:     version,
 		Flags: []cli.Flag{
 			&ModeFlag,
 			&LogLevelFlag,
@@ -113,7 +115,13 @@ func main() {
 				g.Use(cors.New(corsCfg))
 			}
 
-			r := router.NewRouter(g, &router.TranslateValidate{UniversalTranslator: translate, Validate: validate})
+			status := model.ServiceStatus{
+				Name:     ctx.App.Name,
+				Version:  ctx.App.Version,
+				StatusOK: true,
+			}
+
+			r := router.NewRouter(g, &status, &router.TranslateValidate{UniversalTranslator: translate, Validate: validate})
 			r.SetupVolumeHandlers(srv)
 			r.SetupStorageHandlers(srv)
 

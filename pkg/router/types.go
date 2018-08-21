@@ -7,6 +7,7 @@ import (
 	"git.containerum.net/ch/volume-manager/pkg/router/middleware"
 	"git.containerum.net/ch/volume-manager/static"
 	"github.com/containerum/cherry"
+	"github.com/containerum/kube-client/pkg/model"
 	"github.com/containerum/utils/httputil"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/universal-translator"
@@ -78,8 +79,10 @@ type Router struct {
 	tv     *TranslateValidate
 }
 
-func NewRouter(engine gin.IRouter, tv *TranslateValidate) *Router {
+func NewRouter(engine gin.IRouter, status *model.ServiceStatus, tv *TranslateValidate) *Router {
 	engine.StaticFS("/static", static.HTTP)
+
+	engine.GET("/status", httputil.ServiceStatus(status))
 
 	ret := &Router{
 		engine: engine,
