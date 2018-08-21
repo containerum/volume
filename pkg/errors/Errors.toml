@@ -56,7 +56,7 @@ SID = "volume-manager"
 [[error]]
     Name = "ErrNoFreeStorages"
     StatusHTTP = 507
-    Message = "No free storages found for volume"
+    Message = "No free space found on storage"
     Kind = 9
 
 [[error]]
