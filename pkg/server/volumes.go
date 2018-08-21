@@ -98,6 +98,10 @@ func (s *Server) ImportVolume(ctx context.Context, nsID string, req kubeClientMo
 			return getErr
 		}
 
+		if req.Owner == "" {
+			req.Owner = ZeroUUID
+		}
+
 		volume := model.Volume{
 			Resource: model.Resource{
 				Label:       req.Name,
