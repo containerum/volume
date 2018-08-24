@@ -5,7 +5,7 @@ COPY . .
 RUN VERSION=$(git describe --abbrev=0 --tags) make build-for-docker
 
 FROM alpine:3.7
-COPY --from=builder /tmp/volume-manager /app
+COPY --from=builder /tmp/volume-manager /
 
 ENV MODE="release" \
     LOG_LEVEL=4 \
