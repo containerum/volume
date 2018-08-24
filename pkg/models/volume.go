@@ -19,7 +19,7 @@ type Volume struct {
 	Capacity int `sql:"capacity,notnull" json:"capacity"`
 
 	// swagger:strfmt uuid
-	NamespaceID string `sql:"ns_id,type:string" json:"namespace_id,omitempty"`
+	NamespaceID string `sql:"ns_id,type:text" json:"namespace_id,omitempty"`
 
 	StorageName string `sql:"storage_name,notnull" json:"storage_name,omitempty"`
 
