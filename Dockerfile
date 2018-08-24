@@ -1,12 +1,11 @@
 FROM golang:1.10-alpine as builder
-
-WORKDIR /go/src/git.containerum.net/ch/volume-manager
+RUN apk add --update make git
+WORKDIR src/git.containerum.net/ch/volume-manager
 COPY . .
-RUN go build -v -ldflags="-w -s" -o /bin/volume-manager ./cmd/volume-manager
+RUN VERSION=$(git describe --abbrev=0 --tags) make build-for-docker
 
 FROM alpine:3.7
-RUN mkdir -p /app
-COPY --from=builder /bin/volume-manager /app
+COPY --from=builder /tmp/volume-manager /
 
 ENV MODE="release" \
     LOG_LEVEL=4 \
@@ -21,4 +20,4 @@ ENV MODE="release" \
 
 EXPOSE 4343
 
-CMD "/app/volume-manager"
+CMD "/volume-manager"
