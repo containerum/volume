@@ -49,9 +49,18 @@ func (s *Server) DirectCreateVolume(ctx context.Context, nsID string, req model.
 		"user_id":  userID,
 	}).Infof("create volume")
 
-	storage, getErr := s.db.StorageByName(ctx, req.Storage)
-	if getErr != nil {
-		return getErr
+	var storage model.Storage
+	var err error
+	if req.Storage != "" {
+		storage, err = s.db.StorageByName(ctx, req.Storage)
+		if err != nil {
+			return err
+		}
+	} else {
+		storage, err = s.db.LeastUsedStorage(ctx, req.Capacity)
+		if err != nil {
+			return err
+		}
 	}
 
 	if storage.Size-storage.Used-req.Capacity < 0 {
@@ -68,7 +77,7 @@ func (s *Server) DirectCreateVolume(ctx context.Context, nsID string, req model.
 		StorageName: storage.Name,
 	}
 
-	err := s.db.Transactional(func(tx database.DB) error {
+	return s.db.Transactional(func(tx database.DB) error {
 		if createErr := tx.CreateVolume(ctx, &volume); createErr != nil {
 			return createErr
 		}
@@ -81,8 +90,6 @@ func (s *Server) DirectCreateVolume(ctx context.Context, nsID string, req model.
 
 		return nil
 	})
-
-	return err
 }
 
 func (s *Server) ImportVolume(ctx context.Context, nsID string, req kubeClientModel.Volume) error {
@@ -134,66 +141,62 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 	freeVolume := req.TariffID == ZeroUUID
 
 	var tariff billing.VolumeTariff
+	var nsTariff billing.NamespaceTariff
+	var volumeSize int
 
+	var err error
 	if !freeVolume {
-		var err error
 		tariff, err = s.clients.Billing.GetVolumeTariff(ctx, req.TariffID)
 		if err != nil {
 			return err
 		}
 
-		if chkErr := CheckTariff(tariff.Tariff, IsAdminRole(ctx)); chkErr != nil {
-			return chkErr
+		if err := CheckTariff(tariff.Tariff, IsAdminRole(ctx)); err != nil {
+			return err
 		}
+		volumeSize = tariff.StorageLimit
+	} else {
+		nsTariff, err = s.clients.Billing.GetTariffForNamespace(ctx, nsID)
+		if err != nil {
+			return err
+		}
+		volumeSize = nsTariff.VolumeSize
 	}
 
-	storage, getErr := s.db.StorageByName(ctx, req.Storage)
-	if getErr != nil {
-		return getErr
-	}
-
-	var volume model.Volume
-	if freeVolume {
-		nsTariff, getErr := s.clients.Billing.GetTariffForNamespace(ctx, nsID)
-		if getErr != nil {
-			return getErr
-		}
-
-		if nsTariff.VolumeSize == 0 {
-			return errors.ErrQuotaExceeded()
-		}
-
-		if storage.Size-storage.Used-nsTariff.VolumeSize < 0 {
-			return errors.ErrNoFreeStorages()
-		}
-
-		volume = model.Volume{
-			Resource: model.Resource{
-				TariffID:    &req.TariffID,
-				Label:       req.Label,
-				OwnerUserID: userID,
-			},
-			Capacity:    nsTariff.VolumeSize,
-			NamespaceID: nsID,
-			StorageName: storage.Name,
+	var storage model.Storage
+	if req.Storage != "" {
+		storage, err = s.db.StorageByName(ctx, req.Storage)
+		if err != nil {
+			return err
 		}
 	} else {
-		if storage.Size-storage.Used-tariff.StorageLimit < 0 {
-			return errors.ErrNoFreeStorages()
+		storage, err = s.db.LeastUsedStorage(ctx, volumeSize)
+		if err != nil {
+			return err
 		}
+	}
 
-		volume = model.Volume{
-			Resource: model.Resource{
-				TariffID:    &req.TariffID,
-				Label:       req.Label,
-				OwnerUserID: userID,
-				ID:          uuid.NewV4().String(),
-			},
-			Capacity:    tariff.StorageLimit,
-			NamespaceID: nsID,
-			StorageName: storage.Name,
-		}
+	if volumeSize == 0 {
+		return errors.ErrQuotaExceeded()
+	}
 
+	if storage.Size-storage.Used-volumeSize < 0 {
+		return errors.ErrNoFreeStorages()
+	}
+
+	volume := model.Volume{
+		Resource: model.Resource{
+			TariffID:    &req.TariffID,
+			Label:       req.Label,
+			OwnerUserID: userID,
+			ID:          uuid.NewV4().String(),
+		},
+		Capacity:    volumeSize,
+		NamespaceID: nsID,
+		StorageName: storage.Name,
+	}
+
+	if !freeVolume {
 		subReq := billing.SubscribeTariffRequest{
 			TariffID:      tariff.ID,
 			ResourceType:  billing.Volume,
@@ -205,7 +208,7 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 		}
 	}
 
-	err := s.db.Transactional(func(tx database.DB) error {
+	return s.db.Transactional(func(tx database.DB) error {
 		if createErr := tx.CreateVolume(ctx, &volume); createErr != nil {
 			return createErr
 		}
@@ -218,8 +221,6 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 
 		return nil
 	})
-
-	return err
 }
 
 func (s *Server) GetVolume(ctx context.Context, nsID, label string) (kubeClientModel.Volume, error) {
