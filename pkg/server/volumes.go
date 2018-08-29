@@ -212,9 +212,7 @@ func (s *Server) CreateVolume(ctx context.Context, nsID string, req model.Volume
 		if createErr := tx.CreateVolume(ctx, &volume); createErr != nil {
 			return createErr
 		}
-
 		kubeVol := volume.ToKube()
-
 		if createErr := s.clients.KubeAPI.CreateVolume(ctx, nsID, &kubeVol); createErr != nil {
 			return createErr
 		}
@@ -291,7 +289,6 @@ func (s *Server) GetAllVolumes(ctx context.Context, page, perPage int, filters .
 	}
 	filter.PerPage = perPage
 	filter.Page = page
-
 	vols, err := s.db.AllVolumes(ctx, filter)
 	if err != nil {
 		return kubeClientModel.VolumesList{}, err
@@ -319,6 +316,7 @@ func (s *Server) DeleteVolume(ctx context.Context, nsID, label string) error {
 			return getErr
 		}
 
+		vol.Deleted = true
 		if delErr := tx.DeleteVolume(ctx, &vol); delErr != nil {
 			return delErr
 		}

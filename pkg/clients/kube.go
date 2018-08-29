@@ -65,7 +65,7 @@ func (k *KubeAPIHTTPClient) CreateVolume(ctx context.Context, namespace string, 
 }
 
 func (k *KubeAPIHTTPClient) UpdateVolume(ctx context.Context, namespace string, volume *model.Volume) error {
-	k.log.WithField("namespace", namespace).Debugf("update volume %+v")
+	k.log.WithField("namespace", namespace).Debugf("update volume %+v", volume)
 
 	resp, err := k.client.R().
 		SetContext(ctx).
@@ -123,7 +123,7 @@ func (k *KubeAPIDummyClient) CreateVolume(ctx context.Context, namespace string,
 }
 
 func (k *KubeAPIDummyClient) UpdateVolume(ctx context.Context, namespace string, volume *model.Volume) error {
-	k.log.WithField("namespace", namespace).Debugf("update volume %+v")
+	k.log.WithField("namespace", namespace).Debugf("update volume %+v", volume)
 
 	return nil
 }
