@@ -60,7 +60,7 @@ var version string
 
 func main() {
 	app := cli.App{
-		Name:        "volume-manager",
+		Name:        "volume",
 		Description: "Volume-Manager volumes management service for Container hosting",
 		Version:     version,
 		Flags: []cli.Flag{
