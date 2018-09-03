@@ -26,7 +26,7 @@ func (pgdb *PgDB) VolumeByLabel(ctx context.Context, nsID, label string) (ret mo
 		Select()
 	switch err {
 	case pg.ErrNoRows:
-		err = errors.ErrResourceNotExists().AddDetailF("volume with %s not exists", label)
+		err = errors.ErrResourceNotExists().AddDetailF("volume with name '%s' not exists", label)
 	default:
 		err = pgdb.handleError(err)
 	}
@@ -107,7 +107,7 @@ func (pgdb *PgDB) DeleteVolume(ctx context.Context, volume *model.Volume) error 
 
 	result, err := pgdb.db.Model(volume).
 		WherePK().
-		Set("deleted = TRUE").
+		Set("deleted = ?deleted").
 		Set("delete_time = now()").
 		Returning("*").
 		Update()
@@ -154,7 +154,6 @@ func (pgdb *PgDB) UpdateVolume(ctx context.Context, volume *model.Volume) error 
 	result, err := pgdb.db.Model(volume).
 		WherePK().
 		Set("tariff_id = ?tariff_id").
-		Set("label = ?label").
 		Set("capacity = ?capacity").
 		Set("ns_id = ?ns_id").
 		Set("access_mode = ?access_mode").

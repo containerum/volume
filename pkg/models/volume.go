@@ -19,7 +19,7 @@ type Volume struct {
 	Capacity int `sql:"capacity,notnull" json:"capacity"`
 
 	// swagger:strfmt uuid
-	NamespaceID string `sql:"ns_id,type:uuid" json:"namespace_id,omitempty"`
+	NamespaceID string `sql:"ns_id,type:text" json:"namespace_id,omitempty"`
 
 	StorageName string `sql:"storage_name,notnull" json:"storage_name,omitempty"`
 
@@ -48,7 +48,7 @@ func (v *Volume) BeforeInsert(db orm.DB) error {
 	return err
 }
 
-func (v *Volume) AfterUpdate(db orm.DB) error {
+func (v *Volume) BeforeUpdate(db orm.DB) error {
 	var err error
 	if v.Deleted {
 		_, err = db.Model(&Storage{Name: v.StorageName}).
@@ -56,10 +56,24 @@ func (v *Volume) AfterUpdate(db orm.DB) error {
 			Set("used = used - ?", v.Capacity).
 			Update()
 	} else {
-		oldCapacityQuery := db.Model(v).Column("capacity").WherePK()
+		var oldVol Volume
+		if err := db.Model(&oldVol).Column("capacity").Where("id = ?", v.ID).Select(); err != nil {
+			return err
+		}
+		oldStorage := Storage{
+			Name: v.StorageName,
+		}
+		if err := db.Model(&oldStorage).
+			WherePK().
+			Select(); err != nil {
+			return err
+		}
+		if oldStorage.Used-oldVol.Capacity+v.Capacity > oldStorage.Size {
+			return errors.ErrNoFreeStorages()
+		}
 		_, err = db.Model(&Storage{Name: v.StorageName}).
 			WherePK().
-			Set("used = used - (?) + ?", oldCapacityQuery, v.Capacity).
+			Set("used = used - ? + ?", oldVol.Capacity, v.Capacity).
 			Update(v)
 	}
 	return err
