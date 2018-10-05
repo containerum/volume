@@ -350,6 +350,10 @@ func (s *Server) DeleteAllUserVolumes(ctx context.Context) error {
 			return err
 		}
 
+		for i := range vols {
+			vols[i].Deleted = true
+		}
+
 		if delErr := tx.DeleteVolumes(ctx, vols); delErr != nil {
 			return delErr
 		}
@@ -384,6 +388,10 @@ func (s *Server) DeleteAllNamespaceVolumes(ctx context.Context, nsID string) err
 			return nil
 		default:
 			return err
+		}
+
+		for i := range vols {
+			vols[i].Deleted = true
 		}
 
 		if delErr := tx.DeleteVolumes(ctx, vols); delErr != nil {
