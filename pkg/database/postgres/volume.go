@@ -137,7 +137,7 @@ func (pgdb *PgDB) DeleteVolumes(ctx context.Context, volumes []model.Volume) err
 	volumes = nil
 	_, err := pgdb.db.Model(&volumes).
 		Where("id IN (?)", pg.In(volIDs)).
-		Set("deleted = TRUE").
+		Set("deleted = ?deleted").
 		Set("delete_time = now()").
 		Returning("*").
 		Update()
