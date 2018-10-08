@@ -74,7 +74,7 @@
           "default": {
             "description": "cherry error",
             "schema": {
-              "$ref": "#/definitions/errOAIGen"
+              "$ref": "#/definitions/adminResizeVolumeDefaultBody"
             }
           }
         }
@@ -144,7 +144,99 @@
           "default": {
             "description": "cherry error",
             "schema": {
-              "$ref": "#/definitions/errOAIGen"
+              "$ref": "#/definitions/adminResizeVolumeDefaultBody"
+            }
+          }
+        }
+      }
+    },
+    "/import/storages": {
+      "post": {
+        "tags": [
+          "Storages"
+        ],
+        "summary": "Import storages.",
+        "operationId": "ImportStorages",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "storages imported",
+            "schema": {
+              "$ref": "#/definitions/ImportResponse"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/adminResizeVolumeDefaultBody"
+            }
+          }
+        }
+      }
+    },
+    "/import/volumes": {
+      "post": {
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "Import volumes.",
+        "operationId": "ImportVolumes",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "uuid",
+            "name": "X-User-ID",
+            "in": "header",
+            "required": true
+          },
+          {
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "type": "string",
+            "name": "X-User-Role",
+            "in": "header",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/VolumesList"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "volumes imported",
+            "schema": {
+              "$ref": "#/definitions/ImportResponse"
+            }
+          },
+          "default": {
+            "description": "cherry error",
+            "schema": {
+              "$ref": "#/definitions/adminResizeVolumeDefaultBody"
             }
           }
         }
@@ -207,7 +299,7 @@
           "default": {
             "description": "cherry error",
             "schema": {
-              "$ref": "#/definitions/errOAIGen"
+              "$ref": "#/definitions/adminResizeVolumeDefaultBody"
             }
           }
         }
@@ -267,7 +359,7 @@
           "default": {
             "description": "cherry error",
             "schema": {
-              "$ref": "#/definitions/errOAIGen"
+              "$ref": "#/definitions/adminResizeVolumeDefaultBody"
             }
           }
         }
@@ -328,7 +420,7 @@
           "default": {
             "description": "cherry error",
             "schema": {
-              "$ref": "#/definitions/errOAIGen"
+              "$ref": "#/definitions/adminResizeVolumeDefaultBody"
             }
           }
         }
@@ -380,7 +472,7 @@
           "default": {
             "description": "cherry error",
             "schema": {
-              "$ref": "#/definitions/errOAIGen"
+              "$ref": "#/definitions/adminResizeVolumeDefaultBody"
             }
           }
         }
@@ -443,7 +535,7 @@
           "default": {
             "description": "cherry error",
             "schema": {
-              "$ref": "#/definitions/errOAIGen"
+              "$ref": "#/definitions/adminResizeVolumeDefaultBody"
             }
           }
         }
@@ -509,7 +601,7 @@
           "default": {
             "description": "cherry error",
             "schema": {
-              "$ref": "#/definitions/errOAIGen"
+              "$ref": "#/definitions/adminResizeVolumeDefaultBody"
             }
           }
         }
@@ -567,7 +659,7 @@
           "default": {
             "description": "cherry error",
             "schema": {
-              "$ref": "#/definitions/errOAIGen"
+              "$ref": "#/definitions/adminResizeVolumeDefaultBody"
             }
           }
         }
@@ -619,7 +711,7 @@
           "default": {
             "description": "cherry error",
             "schema": {
-              "$ref": "#/definitions/errOAIGen"
+              "$ref": "#/definitions/adminResizeVolumeDefaultBody"
             }
           }
         }
@@ -671,7 +763,7 @@
           "default": {
             "description": "cherry error",
             "schema": {
-              "$ref": "#/definitions/errOAIGen"
+              "$ref": "#/definitions/adminResizeVolumeDefaultBody"
             }
           }
         }
@@ -731,7 +823,7 @@
           "default": {
             "description": "cherry error",
             "schema": {
-              "$ref": "#/definitions/errOAIGen"
+              "$ref": "#/definitions/adminResizeVolumeDefaultBody"
             }
           }
         }
@@ -781,7 +873,7 @@
           "default": {
             "description": "cherry error",
             "schema": {
-              "$ref": "#/definitions/errOAIGen"
+              "$ref": "#/definitions/adminResizeVolumeDefaultBody"
             }
           }
         }
@@ -833,7 +925,7 @@
           "default": {
             "description": "cherry error",
             "schema": {
-              "$ref": "#/definitions/errOAIGen"
+              "$ref": "#/definitions/adminResizeVolumeDefaultBody"
             }
           }
         }
@@ -877,7 +969,7 @@
           "default": {
             "description": "cherry error",
             "schema": {
-              "$ref": "#/definitions/errOAIGen"
+              "$ref": "#/definitions/adminResizeVolumeDefaultBody"
             }
           }
         }
@@ -1093,7 +1185,23 @@
       "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
     },
     "CreateVolume": {
-      "$ref": "#/definitions/createVolumeOAIGen"
+      "description": "CreateVolume --",
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "x-go-name": "Label"
+        },
+        "storage": {
+          "type": "string",
+          "x-go-name": "Storage"
+        },
+        "tariff_id": {
+          "type": "string",
+          "x-go-name": "TariffID"
+        }
+      },
+      "x-go-package": "github.com/containerum/kube-client/pkg/model"
     },
     "Deployment": {
       "description": "Deployment -- model for deployments",
@@ -1135,6 +1243,10 @@
         "name": {
           "type": "string",
           "x-go-name": "Name"
+        },
+        "namespace": {
+          "type": "string",
+          "x-go-name": "Namespace"
         },
         "owner": {
           "type": "string",
@@ -1336,6 +1448,54 @@
         },
         "Tag": {
           "type": "string"
+        }
+      },
+      "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
+    },
+    "ImportResponse": {
+      "description": "ImportResponse -- response after resources import",
+      "type": "object",
+      "properties": {
+        "failed": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ImportResult"
+          },
+          "x-go-name": "Failed"
+        },
+        "imported": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ImportResult"
+          },
+          "x-go-name": "Imported"
+        }
+      },
+      "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
+    },
+    "ImportResponseTotal": {
+      "description": "ImportResponseTotal -- import response for all services",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/ImportResponse"
+      },
+      "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
+    },
+    "ImportResult": {
+      "description": "ImportResult -- import result for one resource",
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "x-go-name": "Message"
+        },
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        },
+        "namespace": {
+          "type": "string",
+          "x-go-name": "Namespace"
         }
       },
       "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
@@ -1732,13 +1892,37 @@
       "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
     },
     "ResourceType": {
-      "$ref": "#/definitions/resourceTypeOAIGen"
+      "type": "string",
+      "enum": [
+        "namespace",
+        "volume"
+      ]
     },
     "ResourceUpdateName": {
-      "$ref": "#/definitions/resourceUpdateNameOAIGen"
+      "description": "ResourceUpdateName -- contains new resource name",
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "x-go-name": "Label"
+        }
+      },
+      "x-go-package": "github.com/containerum/kube-client/pkg/model"
     },
     "ResourceUpdateUserAccess": {
-      "$ref": "#/definitions/resourceUpdateUserAccessOAIGen"
+      "description": "ResourceUpdateUserAccess -- contains user access data",
+      "type": "object",
+      "properties": {
+        "access": {
+          "type": "string",
+          "x-go-package": "github.com/containerum/kube-client/pkg/model"
+        },
+        "username": {
+          "type": "string",
+          "x-go-name": "Username"
+        }
+      },
+      "x-go-package": "github.com/containerum/kube-client/pkg/model"
     },
     "Resources": {
       "type": "object",
@@ -1835,6 +2019,10 @@
           "type": "string",
           "x-go-name": "Name"
         },
+        "namespace": {
+          "type": "string",
+          "x-go-name": "Namespace"
+        },
         "owner": {
           "type": "string",
           "x-go-name": "Owner"
@@ -1909,6 +2097,10 @@
           "type": "string",
           "x-go-name": "Name"
         },
+        "namespace": {
+          "type": "string",
+          "x-go-name": "Namespace"
+        },
         "owner": {
           "type": "string",
           "x-go-name": "Owner"
@@ -1953,6 +2145,31 @@
           "type": "integer",
           "format": "int64",
           "x-go-name": "TargetPort"
+        }
+      },
+      "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
+    },
+    "ServiceStatus": {
+      "type": "object",
+      "properties": {
+        "details": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "x-go-name": "Details"
+        },
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        },
+        "ok": {
+          "type": "boolean",
+          "x-go-name": "StatusOK"
+        },
+        "version": {
+          "type": "string",
+          "x-go-name": "Version"
         }
       },
       "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
@@ -2130,6 +2347,15 @@
       "description": "Storage describes volumes storage",
       "type": "object",
       "properties": {
+        "delete_time": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "DeleteTime"
+        },
+        "deleted": {
+          "type": "boolean",
+          "x-go-name": "Deleted"
+        },
         "name": {
           "type": "string",
           "x-go-name": "Name"
@@ -2435,6 +2661,10 @@
           "type": "string",
           "x-go-name": "Name"
         },
+        "namespace": {
+          "type": "string",
+          "x-go-name": "Namespace"
+        },
         "owner": {
           "type": "string",
           "x-go-name": "Owner"
@@ -2547,22 +2777,7 @@
       },
       "x-go-package": "git.containerum.net/ch/volume-manager/vendor/github.com/containerum/kube-client/pkg/model"
     },
-    "createVolumeOAIGen": {
-      "description": "CreateVolume --",
-      "type": "object",
-      "properties": {
-        "label": {
-          "type": "string",
-          "x-go-name": "Label"
-        },
-        "tariff_id": {
-          "type": "string",
-          "x-go-name": "TariffID"
-        }
-      },
-      "x-go-package": "github.com/containerum/kube-client/pkg/model"
-    },
-    "errOAIGen": {
+    "adminResizeVolumeDefaultBody": {
       "description": "Err -- standard serializable API error\nMessage -- constant error message:\n+ \"invalid username\"\n+ \"quota exceeded\"\n+ \"validation error\"\n...etc...\nID -- unique error identification code\nDetails -- optional context error messages kinda\n+ \"field 'Replicas' must be non-zero value\"\n+ \"not enough tights to feed gopher\"\n+ \"resource 'God' does't exist\"\nFields -- optional set of key-value pairs",
       "type": "object",
       "properties": {
@@ -2582,7 +2797,22 @@
           "x-go-package": "github.com/containerum/cherry"
         },
         "id": {
-          "$ref": "#/definitions/errOaiGenId"
+          "description": "ErrID -- represents unique error ID",
+          "type": "object",
+          "properties": {
+            "kind": {
+              "description": "ErrKind -- represents kind of error",
+              "type": "integer",
+              "format": "uint64",
+              "x-go-package": "github.com/containerum/cherry"
+            },
+            "sid": {
+              "description": "ErrSID -- represents service ID of error",
+              "type": "string",
+              "x-go-package": "github.com/containerum/cherry"
+            }
+          },
+          "x-go-package": "github.com/containerum/cherry"
         },
         "message": {
           "type": "string",
@@ -2594,59 +2824,8 @@
           "x-go-name": "StatusHTTP"
         }
       },
+      "x-go-gen-location": "operations",
       "x-go-package": "github.com/containerum/cherry"
-    },
-    "errOaiGenId": {
-      "description": "ErrID -- represents unique error ID",
-      "type": "object",
-      "properties": {
-        "kind": {
-          "description": "ErrKind -- represents kind of error",
-          "type": "integer",
-          "format": "uint64",
-          "x-go-package": "github.com/containerum/cherry"
-        },
-        "sid": {
-          "description": "ErrSID -- represents service ID of error",
-          "type": "string",
-          "x-go-package": "github.com/containerum/cherry"
-        }
-      },
-      "x-go-gen-location": "models",
-      "x-go-package": "github.com/containerum/cherry"
-    },
-    "resourceTypeOAIGen": {
-      "type": "string",
-      "enum": [
-        "namespace",
-        "volume"
-      ]
-    },
-    "resourceUpdateNameOAIGen": {
-      "description": "ResourceUpdateName -- contains new resource name",
-      "type": "object",
-      "properties": {
-        "label": {
-          "type": "string",
-          "x-go-name": "Label"
-        }
-      },
-      "x-go-package": "github.com/containerum/kube-client/pkg/model"
-    },
-    "resourceUpdateUserAccessOAIGen": {
-      "description": "ResourceUpdateUserAccess -- contains user access data",
-      "type": "object",
-      "properties": {
-        "access": {
-          "type": "string",
-          "x-go-package": "github.com/containerum/kube-client/pkg/model"
-        },
-        "username": {
-          "type": "string",
-          "x-go-name": "Username"
-        }
-      },
-      "x-go-package": "github.com/containerum/kube-client/pkg/model"
     }
   },
   "parameters": {
@@ -2705,7 +2884,7 @@
     "error": {
       "description": "cherry error",
       "schema": {
-        "$ref": "#/definitions/errOAIGen"
+        "$ref": "#/definitions/adminResizeVolumeDefaultBody"
       }
     }
   }
