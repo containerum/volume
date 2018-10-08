@@ -21,7 +21,6 @@ type DB interface {
 	AllVolumes(ctx context.Context, filter VolumeFilter) ([]model.Volume, error)
 	CreateVolume(ctx context.Context, volume *model.Volume) error
 	DeleteVolume(ctx context.Context, volume *model.Volume) error
-	DeleteVolumes(ctx context.Context, volumes []model.Volume) error
 	UpdateVolume(ctx context.Context, volume *model.Volume) error
 
 	Transactional(func(tx DB) error) error
