@@ -122,32 +122,6 @@ func (pgdb *PgDB) DeleteVolume(ctx context.Context, volume *model.Volume) error 
 	return nil
 }
 
-func (pgdb *PgDB) DeleteVolumes(ctx context.Context, volumes []model.Volume) error {
-	pgdb.log.Debugf("delete volumes %+v", volumes)
-
-	if len(volumes) == 0 {
-		return nil
-	}
-
-	volIDs := make([]string, len(volumes))
-	for i := range volumes {
-		volIDs[i] = volumes[i].ID
-	}
-
-	volumes = nil
-	_, err := pgdb.db.Model(&volumes).
-		Where("id IN (?)", pg.In(volIDs)).
-		Set("deleted = TRUE").
-		Set("delete_time = now()").
-		Returning("*").
-		Update()
-	if err != nil {
-		return pgdb.handleError(err)
-	}
-
-	return nil
-}
-
 func (pgdb *PgDB) UpdateVolume(ctx context.Context, volume *model.Volume) error {
 	pgdb.log.Debugf("update volume %+v", volume)
 

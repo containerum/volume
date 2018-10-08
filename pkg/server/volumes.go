@@ -350,12 +350,11 @@ func (s *Server) DeleteAllUserVolumes(ctx context.Context) error {
 			return err
 		}
 
-		for i := range vols {
-			vols[i].Deleted = true
-		}
-
-		if delErr := tx.DeleteVolumes(ctx, vols); delErr != nil {
-			return delErr
+		for _, vol := range vols {
+			vol.Deleted = true
+			if delErr := tx.DeleteVolume(ctx, &vol); delErr != nil {
+				return delErr
+			}
 		}
 
 		var resourceIDs []string
@@ -390,12 +389,11 @@ func (s *Server) DeleteAllNamespaceVolumes(ctx context.Context, nsID string) err
 			return err
 		}
 
-		for i := range vols {
-			vols[i].Deleted = true
-		}
-
-		if delErr := tx.DeleteVolumes(ctx, vols); delErr != nil {
-			return delErr
+		for _, vol := range vols {
+			vol.Deleted = true
+			if delErr := tx.DeleteVolume(ctx, &vol); delErr != nil {
+				return delErr
+			}
 		}
 
 		var resourceIDs []string
